@@ -302,7 +302,9 @@
     <div id="userModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>사용자 정보</h2>
+            <h2>${p.user_id }</h2>
+            <h2>${p.user_nickname }</h2>
+            <img src="static/images/setting/${p.user_image_url}" alt="Post Image">
             <p>아래의 링크로 사용자와 관련된 작업을 수행할 수 있습니다.</p>
             <a href="" id="profile-link">프로필</a> <br />
             <a href="" id="message-link">쪽지 보내기</a> <br />
@@ -310,6 +312,9 @@
         </div>
     </div>
 
+
+	
+	
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('userModal');
@@ -345,7 +350,7 @@
 
     <br />
     <br />
-    <a href="postReg.do" class="btn">글쓰기</a>
+    <a href="communityReg?c=${param.c}" class="btn">글쓰기</a>
     <br />
     <br />
 

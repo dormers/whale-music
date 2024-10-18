@@ -115,10 +115,14 @@
                 <th>내용</th>
                 <td colspan="3">${postDetail.post_text }</td>
             </tr>
-            <tr>
-                <th>이미지</th>
-                <td colspan="3"><%-- ${postDetail.post_img } --%></td>
-            </tr>
+			<tr>
+			    <th>이미지</th>
+			    <td colspan="3">
+			        <c:forEach var="image" items="${postDetail.images}">
+			        	<img src="static/images/community/${image.post_img_name}" alt="Post Image">
+			        </c:forEach>
+			    </td>
+			</tr>
         </tbody>
     </table>
 	<br />
@@ -129,49 +133,66 @@
 	    <button type="submit">좋아요</button>
 		<span id="likeCount">${postDetail.likeCount}</span> <!-- 좋아요 수 표시 -->
 	</form>
-    <c:if test="${p.user_id eq uid}">
-        <a href="postUpdate.do?p=${p.post_id }" class="btn">수정</a>
-        <a href="postDelProc.jsp?p=${p.post_id }" class="btn">삭제</a>
+    <c:if test="${postDetail.user_id eq now_id}">
+        <a href="communityDetailUpdate?p=${postDetail.post_id }" class="btn">수정</a>
+        <a href="communityDetailDel?c=${param.c }&p=${postDetail.post_id }" class="btn">삭제</a>
     </c:if>
 
     <a href="communityPost?c=${param.c }" class="btn">목록</a>
 
-	<table>
-	    <thead>
-	        <tr>
-	            <th>작성자</th>
-	            <th>코멘트</th>
-	            <th>작성일</th>
-	        </tr>
-	    </thead>
-	    <tbody>
-	        <c:forEach var="comment" items="${postDetail.comments}">
-	            <tr>
-	                <td>${comment.user_id}</td>
-	                <td>${comment.post_comments_text}</td>
-	                <td>${comment.post_comments_date}</td>
-	                <td>${comment.post_comments_id}</td>
-	                <td>
+<table class="table">
+    <colgroup>
+        <col style="width: 15%;"> <!-- 작성자 칸 -->
+        <col style="width: 55%;"> <!-- 코멘트 칸 (넓게) -->
+        <col style="width: 20%;"> <!-- 날짜 칸 (좁게) -->
+        <col style="width: 10%;"> <!-- 관리 칸 -->
+    </colgroup>
+    <thead>
+        <tr>
+            <th>작성자</th>
+            <th>코멘트</th>
+            <th>작성일</th>
+            <c:if test= "${comment.user_id eq now_id}">
+	            <th>관리</th>
+			</c:if>
+        </tr>
+    </thead>
+    <tbody>
+        <c:forEach var="comment" items="${postDetail.comments}">
+            <tr>
+                <td>${comment.user_id}</td> <!-- 작성자 열 -->
+                <td>${comment.post_comments_text}</td> <!-- 코멘트 열 -->
+                <td>${comment.post_comments_date}</td> <!-- 작성일 열 -->
+                <td>
                     <form action="communityDetail/deleteComment" method="post">
                         <input type="hidden" name="postCommentsId" value="${comment.post_comments_id}" />
                         <input type="hidden" name="postId" value="${postDetail.post_id}" />
                         <input type="hidden" name="communityId" value="${param.c}" />
-                        <button type="submit">삭제</button>
+                        <c:if test= "${comment.user_id eq now_id}">
+	                        <button type="submit">삭제</button>
+						</c:if>
                     </form>
-                	</td>
-	            </tr>
-	        </c:forEach>
-	    </tbody>
-	</table>
+                </td> <!-- 관리(삭제) 열 -->
+            </tr>
+        </c:forEach>
+
+        <!-- 코멘트 입력 폼 -->
+        <tr>
+            <td>${now_id}</td> <!-- 작성자 열 -->
+            <td>
+                <form action="communityDetail/comments" method="post">
+                    <input type="hidden" name="postId" value="${postDetail.post_id}">
+                    <input type="hidden" name="userId" value="${now_id}">
+                    <input type="hidden" name="c" value="${param.c}"> <!-- 커뮤니티 ID -->
+                    <input type="text" name="comments" id="comment" style="width: 80%;">
+                    <button type="submit" class="btn">입력</button>
+                </form>
+            </td> <!-- 코멘트 입력 열 -->
+            <td colspan="2"></td> <!-- 작성일 및 관리 열은 비워둠 -->
+        </tr>
+    </tbody>
+</table>
 	
 	<!-- 코멘트 입력 폼 -->
-	<form action="communityDetail/comments" method="post">
-	    <input type="hidden" name="postId" value="${postDetail.post_id}">
-	    <input type="hidden" name="userId" value="kim">
-	    <input type="hidden" name="c" value="${param.c}"> <!-- 커뮤니티 ID -->
-	    <label for="comment">코멘트:</label>
-	    <input type="text" name="comments" id="comment">
-	    <button type="submit">입력</button>
-	</form>
 </body>
 </html>

@@ -11,6 +11,9 @@ const crypto = require('crypto');
 // oracleDB 설치
 const { oracledb, dbConfig } = require("../../models/db/node/oracledb");
 
+// smtp mailer
+const { sendResetEmail } = require("../../models/mailer");
+
 // Spotify 인증을 위한 설정
 const stateKey = 'spotify_auth_state';
 const clientId = process.env.CLIENT_ID;
@@ -20,12 +23,15 @@ const redirectUri = process.env.REDIRECT_URI;
 // 라우터에 정적 파일 제공
 router.use(express.static(path.join(__dirname, "../../../public")));
 
-// 로그인 페이지 및 회원가입 페이지 루트 등록
+// 로그인 페이지 및 회원가입 페이지, 아이디/비밀번호 찾기 루트 등록
 router.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../../../public/html/index.html"));
 });
 router.get("/register", (req, res) => {
   res.sendFile(path.join(__dirname, "../../../public/html/register.html"));
+});
+router.get("/find", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../../public/html/find.html"));
 });
 
 // Spring의 메인 페이지로 이동
@@ -173,6 +179,129 @@ router.get('/spotify/login', (req, res) => {
   });
 
   res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
+});
+
+// 사용자 아이디/비밀번호 찾기 시작 API
+router.post("/find/initiate", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ success: false, message: "이메일을 입력해주세요." });
+  }
+
+  let connection;
+  try {
+    // 필요한 로직 수행 (예: 세션 설정, 이메일 전송 등)
+    // 예시: 세션에 authFlow 설정
+    req.session.authFlow = 'find';
+
+    connection = await oracledb.getConnection(dbConfig);
+
+    // 이메일이 존재하는지 확인
+    const result = await connection.execute(
+      `SELECT user_id FROM user_info WHERE user_email = :email`,
+      [email],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({ success: false, message: "등록된 이메일이 아닙니다." });
+    }
+
+    const userId = result.rows[0].USER_ID;
+
+    // 고유 토큰 생성
+    const token = crypto.randomBytes(32).toString('hex');
+
+    // 토큰 저장
+    await connection.execute(
+      `INSERT INTO password_resets (user_id, token) VALUES (:user_id, :token)`,
+      [userId, token],
+      { autoCommit: true }
+    );
+
+    // 비밀번호 재설정 링크 생성
+    const resetLink = `https://localhost:5500/whale/reset-password.html?token=${token}`;
+
+    // 이메일 발송
+    await sendResetEmail(email, resetLink, userId);
+
+    res.json({ success: true, message: "비밀번호 재설정 링크가\n이메일로 전송되었습니다." });
+  } catch (err) {
+    console.error("아이디/비밀번호 찾기 시작 에러:", err);
+    res.status(500).json({ success: false, message: "서버 에러가 발생했습니다." });
+  }
+});
+
+// **비밀번호 재설정 페이지 라우트 추가**
+router.get("/reset-password.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../../public/html/reset-password.html"));
+});
+
+// 사용자 비밀번호 재설정 API
+router.post("/find/reset-password", async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ success: false, message: "모든 필드를 입력해주세요." });
+  }
+
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+
+    // 토큰 검증 및 사용자 ID 조회
+    const result = await connection.execute(
+      `SELECT user_id, created_at FROM password_resets WHERE token = :token`,
+      [token],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({ success: false, message: "유효하지 않은 토큰입니다." });
+    }
+
+    const { USER_ID: userId, CREATED_AT: createdAt } = result.rows[0];
+
+    // 토큰 유효 기간 확인 (예: 1시간)
+    const currentTime = new Date();
+    const tokenTime = new Date(createdAt);
+    const diffHours = Math.abs(currentTime - tokenTime) / 36e5;
+
+    if (diffHours > 1) {
+      // 토큰 만료
+      await connection.execute(
+        `DELETE FROM password_resets WHERE token = :token`,
+        [token],
+        { autoCommit: true }
+      );
+      return res.json({ success: false, message: "토큰이 만료되었습니다. 다시 시도해주세요." });
+    }
+
+    // 비밀번호 해싱
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // 비밀번호 업데이트
+    await connection.execute(
+      `UPDATE user_info SET user_password = :password WHERE user_id = :user_id`,
+      [hashedPassword, userId],
+      { autoCommit: true }
+    );
+
+    // 사용된 토큰 삭제
+    await connection.execute(
+      `DELETE FROM password_resets WHERE token = :token`,
+      [token],
+      { autoCommit: true }
+    );
+
+    res.json({ success: true, message: "비밀번호가 성공적으로 변경되었습니다." });
+
+  } catch (err) {
+    console.error("비밀번호 재설정 에러:", err);
+    res.status(500).json({ success: false, message: "서버 에러가 발생했습니다." });
+  }
 });
 
 // Spotify 콜백 처리

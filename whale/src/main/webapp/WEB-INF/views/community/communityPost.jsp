@@ -200,40 +200,89 @@
         margin-top: 15px;
     }
 
-    /* 모달 스타일 */
-    .modal {
-        display: none; /* 기본적으로 숨겨진 상태 */
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.4);
-    }
-
-    .modal-content {
-        background-color: #FFFFFF;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        color: #000000;
-    }
-
-    .close {
-        color: #888;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
+	/* 모달 영역 CSS */
+	.modal {
+	    display: none;
+	    position: fixed;
+	    z-index: 1;
+	    left: 0;
+	    top: 0;
+	    width: 100%;
+	    height: 100%;
+	    background-color: rgba(0, 0, 0, 0.6);
+	}
+	
+	.modal-content {
+	    background-color: #1e2650;
+	    margin: 15% auto;
+	    padding: 20px;
+	    border-radius: 15px;
+	    width: 320px;
+	    color: #ffffff;
+	    font-family: 'Noto Sans', sans-serif;
+	    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+	
+	.close {
+	    color: #aaa;
+	    float: right;
+	    font-size: 28px;
+	    font-weight: bold;
+	    cursor: pointer;
+	}
+	
+	.close:hover,
+	.close:focus {
+	    color: white;
+	    text-decoration: none;
+	}
+	
+	.modal-header {
+	    display: flex;
+	    align-items: center;
+	    margin-bottom: 20px;
+	}
+	
+	.modal-header img {
+	    border-radius: 50%;
+	    width: 80px;
+	    height: 80px;
+	    margin-right: 15px;
+	    border: 2px solid #ffffff;
+	}
+	
+	.modal-info h2 {
+	    font-size: 20px;
+	    font-weight: bold;
+	    margin: 0;
+	}
+	
+	.modal-info p {
+	    font-size: 14px;
+	    color: #b0b0b0;
+	    margin: 5px 0 0;
+	}
+	
+	.modal-links {
+	    display: flex;
+	    flex-direction: column;
+	}
+	
+	.modal-links a {
+	    background-color: #2e8b57;
+	    padding: 10px;
+	    border-radius: 10px;
+	    margin-bottom: 10px;
+	    text-decoration: none;
+	    color: #ffffff;
+	    font-weight: bold;
+	    text-align: center;
+	    transition: background-color 0.3s;
+	}
+	
+	.modal-links a:hover {
+	    background-color: #3da165;
+	}
     
     .user-id {
     cursor: pointer;
@@ -284,33 +333,62 @@
             <th>등록일</th>
             <th>조회수</th>
         </tr>
-        <c:forEach items="${list}" var="p">
-            <tr>
-                <td>${p.post_num}</td>
-                <td>${p.post_tag_text}</td>
-                <td><a href="communityDetail?c=${param.c}&p=${p.post_id}">${p.post_title}</a></td>
-                <td>
-                    <span class="user-id" data-user-id="${p.user_id}">${p.user_id}</span>
-                </td>
-                <td>${p.post_date}</td>
-                <td>${p.post_cnt}</td>
-            </tr>
-        </c:forEach>
-    </table>
-
-    <!-- 모달 영역 -->
-    <div id="userModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>${p.user_id }</h2>
-            <h2>${p.user_nickname }</h2>
-            <img src="static/images/setting/${p.user_image_url}" alt="Post Image">
-            <p>아래의 링크로 사용자와 관련된 작업을 수행할 수 있습니다.</p>
-            <a href="" id="profile-link">프로필</a> <br />
-            <a href="" id="message-link">쪽지 보내기</a> <br />
-            <a href="" id="block-link">차단</a>
-        </div>
-    </div>
+		<c:forEach items="${list}" var="p">
+		    <tr>
+		        <td>${p.post_num}</td>
+		        <td>${p.post_tag_text}</td>
+		        <td><a href="communityDetail?c=${param.c}&p=${p.post_id}">${p.post_title}</a></td>
+		        <td>
+		            <span class="user-id" data-user-id="${p.user_id}" 
+		                            data-user-nickname="${p.user_nickname}" 
+		                            data-user-image-url="${p.user_image_url}" 
+		                            onclick="openModal(this)">${p.user_id}</span>
+		        </td>
+		        <td>${p.post_date}</td>
+		        <td>${p.post_cnt}</td>
+		    </tr>
+		</c:forEach>
+	</table>
+		
+	<!-- 모달 영역 -->
+	<div id="userModal" class="modal">
+	    <div class="modal-content">
+	        <span class="close" onclick="closeModal()">&times;</span>
+	        <div class="modal-header">
+	            <img id="modal-user-image" alt="User Image">
+	            <div class="modal-info">
+	                <h2 id="modal-user-nickname"></h2>
+	                <p id="modal-user-id"></p>
+	            </div>
+	        </div>
+	        <div class="modal-links">
+	            <a href="" id="profile-link">프로필</a> 
+	            <a href="" id="message-link">쪽지 보내기</a>
+	            <a href="" id="block-link">차단</a>
+	        </div>
+	    </div>
+	</div>
+		
+		<!-- JavaScript 코드 -->
+		<script>
+		    function openModal(element) {
+		        const userId = element.getAttribute("data-user-id");
+		        const userNickname = element.getAttribute("data-user-nickname");
+		        const userImageUrl = element.getAttribute("data-user-image-url");
+		
+		        // 모달에 값 채우기
+		        document.getElementById("modal-user-id").innerText = "@" + userId;
+		        document.getElementById("modal-user-nickname").innerText = userNickname;
+		        document.getElementById("modal-user-image").src = "static/images/setting/" + userImageUrl;
+		
+		        // 모달 열기
+		        document.getElementById("userModal").style.display = "block";
+		    }
+		
+		    function closeModal() {
+		        document.getElementById("userModal").style.display = "none";
+		    }
+		</script>
 
 
 	

@@ -16,7 +16,7 @@ const MainFooterComponent = {
 	                <button class="playerBtn flexCenter"><img src="static/images/streaming/player/repeat.png" alt="Music Whale Repeat Button" height="32px"></button>
 	            </div>
 	            <div class="playerComponent" id="playerRight">
-	            	<div class="playerRightMargin"><img class="playerFullScreenImg" src="static/images/streaming/player/fullScreenBtn.png" alt="Music Whale Full Screen Button" width="24px" height="24px" @click="fetchIframe('leftIframe','Full')"></div>
+	            	<div class="playerRightMargin"><img class="playerFullScreenImg" src="static/images/streaming/player/fullScreenBtn.png" alt="Music Whale Full Screen Button" width="24px" height="24px"></div>
 	            	<div class="playerRightMargin"><img class="playerPlayListImg" src="static/images/streaming/player/playlist.png" alt="Music Whale Playlist Button" width="34px" height="34px"></div>
 	            </div>
 	        </div>
@@ -26,6 +26,7 @@ const MainFooterComponent = {
 	props: {
 		fetchIframe: {type: Function, default() {return 'Default function'}},
 		fetchWebApi: {type: Function, default() {return 'Default function'}},
+		startPage: Array,
 	},
 	data() {
 		return {
@@ -64,7 +65,8 @@ const MainFooterComponent = {
 					(async () => {await this.fetchData(`http://localhost:9002/whale/main/device_id`);})();
 					
 					// [ The Node js Web App ]
-					this.fetchIframe('leftIframe',sessionStorage.device_id);
+					if (this.startPage[0] === 'streaming') {this.fetchIframe('leftIframe',sessionStorage.device_id);}
+					if (this.startPage[1] === 'streaming') {this.fetchIframe('rightIframe',sessionStorage.device_id);}
 					
 			        console.log('Ready with Device ID', device_id);
 			    });

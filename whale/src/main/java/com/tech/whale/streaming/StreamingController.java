@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tech.whale.streaming.models.db.StreamingTrackDao;
+import com.tech.whale.streaming.models.StreamingTrackDao;
 
 @RestController
 public class StreamingController {

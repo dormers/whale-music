@@ -1,4 +1,4 @@
-package com.tech.whale.streaming.models.db;
+package com.tech.whale.streaming.models;
 
 import org.apache.ibatis.annotations.Mapper;
 

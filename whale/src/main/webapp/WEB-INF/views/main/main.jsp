@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<%@page import="com.tech.whale.main.models.spotify.MainAuthorizationCode"%>
+<%@page import="com.tech.whale.main.models.MainAuthorizationCode"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -20,10 +20,10 @@
 	<div id="main">
 		<main-header-component :header-menu-check="headerMenuCheck" @header-alarm-toggle="menuCheck" @header-profile-toggle="menuCheck"></main-header-component>
 		<div class="main">
-			<main-center-component :frame-names="frameNames" :whale-address="whaleAddress" :replace-iframe="replaceIframe"></main-center-component>
+			<main-center-component :frame-names="frameNames" :replace-iframe="replaceIframe" :start-page="startPage"></main-center-component>
 			<main-header-menu-component :header-menu-check="headerMenuCheck" @header-close-menu="closeMenu" @menu-redirect-iframe="changeRedirectIndex"></main-header-menu-component>
 	    </div>
-	    <main-footer-component :fetch-iframe="fetchIframe" :fetch-web-api="fetchWebApi"></main-footer-component>
+	    <main-footer-component :fetch-iframe="fetchIframe" :fetch-web-api="fetchWebApi" :start-page="startPage"></main-footer-component>
 	</div>
 </body>
 </html>

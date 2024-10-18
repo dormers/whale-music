@@ -45,7 +45,7 @@ async function sendDeviceId(event) {
     .then((response) => response.json())
     .then((data) => {
         sessionStorage.accessToken = data.accessToken;
-        console.log("Success fetching Data to the Node js Wep App");
+        console.log("Success fetching device id to the Node js Wep App");
     })
     .catch((error) => console.error("Failed to fetch the device_id: ", error));
 }

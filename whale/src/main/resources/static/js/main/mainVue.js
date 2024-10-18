@@ -9,7 +9,8 @@ const app = createApp({
 		return {
 			headerMenuCheck: [false, false, false],
 			frameNames: ['leftIframe','rightIframe'],
-			whaleAddress: ['communityHome','streaming','https://open.spotify.com/embed/playlist/37i9dQZF1E4xGcU10nFpkR?utm_source=generator','message/home','feedHome','settingHome'],
+			whaleAddress: ['streaming','https://open.spotify.com/embed/playlist/37i9dQZF1E4xGcU10nFpkR?utm_source=generator','message/home','communityHome','feedHome','settingHome'],
+			startPage: [ null, null ],
 		}
 	},
 	mounted() {

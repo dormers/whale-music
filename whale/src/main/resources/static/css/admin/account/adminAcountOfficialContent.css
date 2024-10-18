@@ -1,0 +1,47 @@
+
+.content {
+	display:flex;
+	flex-direction: column;
+	flex-grow: 1;
+    background-color: white;
+    margin-left:5%;
+    margin-top: 40px;
+    /* padding: 20px; */
+    height: 100%;
+    min-width: 800px;
+}
+
+.accountSearch{
+	display: flex;
+	margin: 0 auto;
+}
+
+#add{
+	
+	text-decoration: none;
+	color: #333;
+	font-size: 20px;
+	margin-left: 200px;
+	width:70px;
+}
+
+
+
+table {
+	margin: 20px 0;
+    width: 1200px;
+    border-collapse: collapse;
+    
+}
+tr {
+	border-bottom: 1px solid #999;
+}
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+tfoot tr {
+    border-bottom: none;
+    text-align: center;
+    
+}

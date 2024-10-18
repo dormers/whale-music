@@ -1,0 +1,10 @@
+* {margin: 0; padding: 0; box-sizing: 0;}
+body {min-height: 100vh; font-family: Arial, sans-serif;}
+
+.setting-body {display: flex; justify-content: center; align-items: center; width: 100%; background-color: rgb(22, 29, 57);}
+.setting-container{width: 60%; height: 90%; border: 1px solid #ccc; border-radius: 40px; background: #E2E2E2; position: relative;}
+.setting-header{padding: 20px 0; text-align: center; font-weight: bold; border-top-left-radius: 40px; border-top-right-radius: 40px; border-bottom: 1px solid #ccc; background-color: rgb(207, 189, 76); position: relative;}
+.setting-item{display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid #ccc;}
+.setting-item img{width: 24px; height: 24px; margin-right: 15px;}
+.setting-item a{text-decoration: none; color: black; font-size: 16px;}
+.setting-item a:focus {color: #ccc;}

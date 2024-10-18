@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Whale Login</title>
+  <link rel="icon" href="../img/whaleLogo.png">
+  <link rel="stylesheet" href="../css/styles.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+  <div class="header">
+    <div class="headerItems flexCenter">
+      <img src="../img/whaleLogo.png" alt="Music Whale Logo" height="80px">
+    </div>
+  </div>
+  <div class="main flexCenter">
+    <div class="loginJoin flexCenter">
+      <div class="loginJoin-container">
+        <h1 class="loginJoin-title">로그인</h1>
+        <form id="login-form">
+          <input type="text" id="username" placeholder="아이디" required><br>
+          <input type="password" id="password" placeholder="비밀번호" required><br>
+          <button type="submit" value="whale">로그인</button><br>
+        </form>
+        <p class="loginJoin-footer">계정이 없으신가요?&nbsp;&nbsp;<a><button id="start-register">회원가입</button></a></p>        
+        <div id="message"></div>
+      </div>
+    </div>
+  </div>
+  <script src="../js/script.js"></script>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#start-register').on('click', function() {
+      $.ajax({
+        url: '/whale/register/initiate',
+        method: 'POST',
+        xhrFields: {
+          withCredentials: true
+        },
+        success: function(response) {
+          if (response.success) {
+            window.location.replace(response.redirectTo);
+          } else {
+            alert(response.message);
+          }
+        },
+        error: function(err) {
+          console.error('회원가입 시작 중 오류 발생:', err);
+        }
+      });
+    });
+  });
+</script>
+</html>

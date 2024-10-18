@@ -1,0 +1,103 @@
+body{
+	background-color: #ddd;
+	
+}
+
+.mainContent {
+	display:flex;
+	position: relative;
+	flex-direction: row;
+	flex-grow: 1;
+    margin:0;
+    height: 100%;
+	width:100%;
+    min-width: 800px;
+}
+#memo{
+	
+	box-sizing: border-box; 
+	width:500px;
+	/* height:88vh; */
+	height: 88vh;
+	border-radius: 10px;
+	background-color: white;
+	padding: 10px;
+	text-align: center;
+	color: white;
+	background-color: #293846;
+	box-sizing: border-box;
+	margin:10px;
+}
+#memo textarea{
+	
+	box-sizing: border-box; 
+	border: none;
+	resize: none;
+	width:450px;
+	height:80vh;
+	border-radius: 10px;
+	padding:5px;
+	outline: none;
+	font-size:20px;
+}
+.blockContainer{
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	margin: 10px 0 0 5px;
+	align-items: flex-start;
+}
+.divStep{
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+}
+.block{
+	display: flex;
+	font-size: 25px;
+	background-color: white;
+	border-radius: 10px;
+	flex-grow: 1;
+	margin:5px;
+	padding: 5px 10px;
+	background-color: white;
+	
+}
+#block1, #block2{
+	display:flex;
+	width:320px;
+	height: 210px;
+}
+
+#block3, #block4{
+	display:flex;
+	width:210px;
+	height: 210px;
+}
+
+#block5{
+	display:flex;
+	width:510px;
+	height: 210px;
+}
+#block6, #block7{
+	display:flex;
+	width:290px;
+	height: 210px;
+}
+
+#block8{
+	display:flex;
+	width:1150px;
+	height: 330px;
+}
+
+
+
+
+
+
+
+
+
+

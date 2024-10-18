@@ -1,0 +1,31 @@
+.adminSubBar {
+	display: flex;
+    width: 200px;
+    margin-top: 5px;
+    margin-left:0;
+    background-color: white;
+    font-size: 22px;
+    border-right: 1px solid #ccc;
+    height:auto;
+    min-width: 200px;
+}
+
+.adminSubBar ul {
+    list-style: none;
+    padding-left:10px;
+}
+
+.adminSubBar ul li {
+    padding: 0 0 0 10px;
+    margin: 10px 0px;
+}
+
+.adminSubBar a {
+    text-decoration: none;
+    color: #aaa;
+}
+
+.adminSubBar a:hover {
+    color: #333;
+    font-weight: bold;
+}

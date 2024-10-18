@@ -1,0 +1,26 @@
+{
+  "name": "whale_streaming",
+  "version": "0.4.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "eclipse",
+  "license": "ISC",
+  "description": "Whale Streaming Wep App",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-session": "^1.18.0",
+    "oracledb": "^6.6.0",
+    "passport": "^0.7.0",
+    "passport-spotify": "^2.0.0",
+    "querystring": "^0.2.1",
+    "spotify-web-api-node": "^5.0.2"
+  }
+}

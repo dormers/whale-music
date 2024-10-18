@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tech.whale.setting.dao.SettingDao">
+	<resultMap id="notificationResultMap" type="map">
+	    <result column="ALL_NOTIFICATION_OFF" property="all_notification_off"/>
+	    <result column="LIKE_NOTIFICATION_ONOFF" property="like_notification_onoff"/>
+	    <result column="COMMENT_NOTIFICATION_ONOFF" property="comment_notification_onoff"/>
+	    <result column="MESSAGE_NOTIFICATION_ONOFF" property="message_notification_onoff"/>
+	</resultMap>
+	<select id="getProfile" resultType="com.tech.whale.setting.dto.UserInfoDto"> 
+		SELECT USER_NICKNAME, USER_EMAIL, USER_IMAGE_URL, USER_PASSWORD FROM USER_INFO WHERE USER_ID = #{session_user_id}
+	</select>
+	<update id="updateProfile">
+		UPDATE USER_INFO SET USER_NICKNAME = #{nickname}, USER_PASSWORD = #{password}, USER_IMAGE_URL = #{newProfileImage}, USER_EMAIL = #{email} WHERE USER_ID = #{session_user_id}
+	</update>
+	<update id="updateAccountPrivacy">
+		UPDATE USER_SETTING SET ACCOUNT_PRIVACY = #{accountPrivacy} WHERE USER_ID = #{session_user_id}
+	</update>
+	<update id="updateNotificationSettings">
+	    UPDATE USER_NOTIFICATION_ONOFF 
+	    SET 
+	        ALL_NOTIFICATION_OFF = #{allNotificationOff}, 
+	        LIKE_NOTIFICATION_ONOFF = #{likeNotificationOnoff}, 
+	        COMMENT_NOTIFICATION_ONOFF = #{commentNotificationOnoff}, 
+	        MESSAGE_NOTIFICATION_ONOFF = #{messageNotificationOnoff} 
+	    WHERE USER_ID = #{session_user_id}
+	</update>
+	<update id="updateLikeNotification">
+	    UPDATE USER_NOTIFICATION_ONOFF 
+	    SET 
+	        LIKE_NOTIFICATION_ONOFF = #{likeNotificationOnOff} 
+	    WHERE USER_ID = #{session_user_id}
+	</update>
+	<update id="updateCommentNotification">
+	    UPDATE USER_NOTIFICATION_ONOFF 
+	    SET  
+	        COMMENT_NOTIFICATION_ONOFF = #{commentNotificationOnOff}
+	    WHERE USER_ID = #{session_user_id}
+	</update>
+	<update id="updateMessageNotification">
+	    UPDATE USER_NOTIFICATION_ONOFF 
+	    SET 
+	        MESSAGE_NOTIFICATION_ONOFF = #{messageNotificationOnOff} 
+	    WHERE USER_ID = #{session_user_id}
+	</update>
+	<select id="getNotificationSettingsByUserId" parameterType="String" resultType="com.tech.whale.setting.dto.UserNotificationDto"> 
+		SELECT ALL_NOTIFICATION_OFF, LIKE_NOTIFICATION_ONOFF, COMMENT_NOTIFICATION_ONOFF, MESSAGE_NOTIFICATION_ONOFF 
+		FROM USER_NOTIFICATION_ONOFF 
+		WHERE USER_ID = #{session_user_id}
+	</select>
+	<select id="getAccountPrivacyByUserId" resultType="com.tech.whale.setting.dto.UserSettingDto"> 
+		SELECT ACCOUNT_PRIVACY FROM USER_SETTING WHERE USER_ID = #{session_user_id}
+	</select>
+	<select id="getBlockList" parameterType="String" resultType="com.tech.whale.setting.dto.BlockDto">
+	    SELECT UI.USER_ID, UI.USER_NICKNAME, UI.USER_IMAGE_URL
+		FROM BLOCK B
+		JOIN USER_INFO UI
+		ON B.BLOCK_USER_ID = UI.USER_ID
+		WHERE B.USER_ID = (SELECT USER_ID FROM USER_INFO WHERE USER_ID = #{session_user_id})
+	</select>
+	<delete id="unblockUser" parameterType="map">
+		DELETE FROM BLOCK WHERE USER_ID = #{session_user_id} AND BLOCK_USER_ID = #{block_userId}
+	</delete>
+	<select id="getDarkmode" resultType="com.tech.whale.setting.dto.UserSettingDto">
+		SELECT DARKMODE_SETTING_ONOFF FROM USER_SETTING WHERE USER_ID = #{session_user_id}
+	</select>
+	<update id="updateDarkmode">
+		UPDATE USER_SETTING SET DARKMODE_SETTING_ONOFF = #{darkmodeOn} WHERE USER_ID = #{session_user_id}
+	</update>
+	<select id="getStartpageSetting" resultType="com.tech.whale.setting.dto.StartpageDto">
+		SELECT STARTPAGE_MUSIC_SETTING, STARTPAGE_FEED_SETTING, STARTPAGE_COMMUNITY_SETTING, STARTPAGE_MESSAGE_SETTING FROM STARTPAGE_SETTING WHERE USER_ID = #{session_user_id}
+	</select>
+	<update id="updateStartpageSetting">
+		UPDATE STARTPAGE_SETTING
+		SET
+			STARTPAGE_MUSIC_SETTING = CASE WHEN #{left} = 'music' THEN 1
+										   WHEN #{right} = 'music' THEN 2
+										   ELSE 0
+									  END,
+			STARTPAGE_FEED_SETTING = CASE WHEN #{left} = 'feed' THEN 1
+										  WHEN #{right} = 'feed' THEN 2
+										  ELSE 0 
+									 END,
+			STARTPAGE_COMMUNITY_SETTING = CASE WHEN #{left} = 'community' THEN 1
+									   		   WHEN #{right} = 'community' THEN 2
+									   		   ELSE 0 
+									   	  END,
+			STARTPAGE_MESSAGE_SETTING = CASE WHEN #{left} = 'message' THEN 1
+											 WHEN #{right} = 'message' THEN 2
+											 ELSE 0 
+									    END
+		WHERE USER_ID = #{userId}
+	</update>
+	
+
+</mapper>

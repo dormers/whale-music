@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tech.whale.community.dao.ComDao">
+	
+    <select id="getComAll" resultType="com.tech.whale.community.dto.CommunityDto">
+        SELECT * FROM COMMUNITY
+    </select>
+    
+    <select id="getCommunityName" resultType="java.lang.String">
+        SELECT COMMUNITY_NAME_EN FROM COMMUNITY WHERE COMMUNITY_ID = #{param1}
+    </select>
+    
+    <select id="chooseTag" resultType="com.tech.whale.community.dto.PostDto">
+        SELECT POST_TAG_ID, POST_TAG_TEXT FROM POST_TAG
+    </select>
+    
+	<sql id="includeCount">
+	    <choose>
+	        <when test="param2 == 1">
+	            AND POST_TITLE LIKE '%' || #{param1} || '%'
+	        </when>
+	        <when test="param2 == 2">
+	            AND POST_TEXT LIKE '%' || #{param1} || '%'
+	        </when>
+	        <when test="param2 == 3">
+	            AND (POST_TITLE LIKE '%' || #{param1} || '%' OR POST_TEXT LIKE '%' || #{param1} || '%')
+	        </when>
+	    </choose>
+	</sql>
+	
+	<sql id="includeList">
+	    <choose>
+	        <when test="param4 == 1">
+	            AND p.POST_TITLE LIKE '%' || #{param3} || '%'
+	        </when>
+	        <when test="param4 == 2">
+	            AND p.POST_TEXT LIKE '%' || #{param3} || '%'
+	        </when>
+	        <when test="param4 == 3">
+	            AND (p.POST_TITLE LIKE '%' || #{param3} || '%' OR p.POST_TEXT LIKE '%' || #{param3} || '%')
+	        </when>
+	    </choose>
+	</sql>
+	
+	<select id="getPostAll" resultType="com.tech.whale.community.dto.PostDto">
+	    SELECT p.POST_ID, p.COMMUNITY_ID, p.USER_ID, p.POST_TITLE, p.POST_TEXT, p.POST_DATE,
+	           p.POST_URL, p.POST_CNT, p.POST_NUM, p.POST_TAG_ID, p.POST_TAG_TEXT
+	    FROM (
+	        SELECT p.POST_ID, p.COMMUNITY_ID, p.USER_ID, p.POST_TITLE, p.POST_TEXT, p.POST_DATE,
+	               p.POST_URL, p.POST_CNT, p.POST_NUM, p.POST_TAG_ID, t.POST_TAG_TEXT,
+	               ROW_NUMBER() OVER(ORDER BY p.POST_NUM DESC) AS POST_SEQ
+	        FROM POST p
+	        JOIN POST_TAG t ON p.POST_TAG_ID = t.POST_TAG_ID
+	        WHERE p.COMMUNITY_ID = #{param5}
+	        <include refid="includeList" />
+	        <if test="param6 != null and param6 != -1">
+	            AND p.POST_TAG_ID = #{param6}
+	        </if>
+	    ) p
+	    WHERE POST_SEQ BETWEEN #{param1} AND #{param2}
+	</select>
+    
+    <select id="selectBoardCount" resultType="Integer">
+        SELECT COUNT(*) FROM POST 
+        WHERE COMMUNITY_ID = #{param3}
+        <include refid="includeCount" />
+        <if test="param4 != null and param4 != -1">
+            AND POST_TAG_ID = #{param4}
+        </if>
+    </select>
+    
+    
+    <select id="getPost" resultType="com.tech.whale.community.dto.PostDto">
+		SELECT P.POST_ID, P.USER_ID, P.POST_TEXT, P.POST_DATE, P.POST_CNT, P.POST_TITLE, T.POST_TAG_TEXT 
+		FROM POST P JOIN POST_TAG T ON P.POST_TAG_ID = T.POST_TAG_ID WHERE P.POST_ID = #{param1}
+	</select>
+	
+    <update id="upCnt">
+		UPDATE POST SET POST_CNT = POST_CNT + 1 WHERE POST_ID = #{param1}
+	</update>
+    
+    
+    <!-- 특정 사용자가 해당 게시글에 좋아요를 눌렀는지 확인 -->
+    <select id="checkUserLikedPost" resultType="int">
+        SELECT COUNT(*) 
+        FROM post_like
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </select>
+
+    <!-- 좋아요 추가 -->
+    <insert id="insertLike">
+        INSERT INTO post_like (post_like_id, post_id, user_id)
+        VALUES (POST_LIKE_SEQ.NEXTVAL, #{postId}, #{userId})
+    </insert>
+
+    <!-- 좋아요 취소 -->
+    <delete id="deleteLike">
+        DELETE FROM post_like 
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </delete>
+
+    <!-- 게시글의 총 좋아요 수 가져오기 -->
+    <select id="getLikeCount" resultType="int">
+        SELECT COUNT(*) 
+        FROM post_like
+        WHERE post_id = #{postId}
+    </select>
+    
+    <insert id="insertComments">
+    	INSERT INTO post_comments (post_comments_id, post_id, user_id, post_comments_text, post_comments_date)
+    	VALUES (POST_COMMENTS_SEQ.NEXTVAL, #{postId}, #{userId}, #{comments}, SYSDATE)
+    </insert>
+    
+    <delete id="deleteComments">
+    	DELETE FROM post_comments
+    	WHERE post_comments_id = #{postCommentsId}
+    </delete>
+    
+    <select id="getComments" resultType="com.tech.whale.community.dto.CommentDto">
+        SELECT post_comments_id, user_id, post_comments_text, post_comments_date 
+        FROM post_comments
+        WHERE post_id = #{postId}
+        ORDER BY post_comments_date ASC
+    </select>
+    
+</mapper>

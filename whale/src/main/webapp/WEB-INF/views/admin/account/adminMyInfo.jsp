@@ -1,0 +1,38 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div>
+	<table>
+		<tr>
+			<td>아이디</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>이름</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>닉네임</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>이메일</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>전화번호</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>등급</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>부서</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>권한부여날짜</td>
+			<td></td>
+		</tr>
+	</table>
+</div>

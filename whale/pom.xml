@@ -88,7 +88,6 @@
 		    <version>1.2</version>
 		</dependency>
 		<!-- DB의 로그 확인을 위한 라이브러리 설치 -->
-		<!--
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter</artifactId>
@@ -115,11 +114,6 @@
 		    <version>2.14.1</version>
 		</dependency>
 		-->
-		<dependency>
-			<groupId>com.oracle.database.jdbc</groupId>
-			<artifactId>ojdbc11</artifactId>
-			<version>21.5.0.0</version>
-		</dependency>
 	</dependencies>
 
 	<build>

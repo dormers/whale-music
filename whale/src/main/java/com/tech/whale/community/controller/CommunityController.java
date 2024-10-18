@@ -1,8 +1,10 @@
 package com.tech.whale.community.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tech.whale.community.dao.ComDao;
 import com.tech.whale.community.dto.CommentDto;
@@ -19,6 +22,7 @@ import com.tech.whale.community.service.ComDetailService;
 import com.tech.whale.community.service.ComHomeService;
 import com.tech.whale.community.service.ComLikeCommentService;
 import com.tech.whale.community.service.ComPostService;
+import com.tech.whale.community.service.ComRegService;
 import com.tech.whale.community.service.ComServiceInter;
 import com.tech.whale.community.vo.SearchVO;
 
@@ -31,6 +35,9 @@ public class CommunityController {
 	
 	@Autowired
 	private ComLikeCommentService comLikeCommentService;
+	
+	@Autowired
+	private ComRegService comRegService;
 	
 	@RequestMapping("/communityHome")
 	public String communityHome(HttpServletRequest request, Model model) {
@@ -66,7 +73,7 @@ public class CommunityController {
 	}
 	
 	@RequestMapping("/communityDetail")
-	public String communityDetail(@RequestParam("c") int communityId, @RequestParam("p") String postId, HttpServletRequest request, Model model) {
+	public String communityDetail(@RequestParam("c") int communityId, HttpSession session, @RequestParam("p") String postId, HttpServletRequest request, Model model) {
 		System.out.println("communityDetail");
 		System.out.println("postId : " + postId);
 		String communityName = comDao.getCommunityName(communityId);
@@ -76,7 +83,14 @@ public class CommunityController {
 		List<CommentDto> commentsList = comLikeCommentService.getCommentsForPost(postId);
 		postDetail.setComments(commentsList);
 		
+		System.out.println(session.getAttribute("user_id"));
+		String now_id = (String) session.getAttribute("user_id");
+		
 		System.out.println("Comments List: " + commentsList);
+		
+		
+		
+		model.addAttribute("now_id", now_id);
 		
 		model.addAttribute("communityName", communityName);
 		model.addAttribute("postId", postId);
@@ -139,9 +153,63 @@ public class CommunityController {
 
 	
 	@RequestMapping("/communityReg")
-	public String communityReg(HttpServletRequest request, Model model) {
+	public String communityReg(HttpServletRequest request, HttpSession session, @RequestParam("c") int communityId, Model model) {
 		System.out.println("communityReg");
+		System.out.println(session.getAttribute("user_id"));
+		String now_id = (String) session.getAttribute("user_id");
+
+		String communityName = comDao.getCommunityName(communityId);
+		
+		List<PostDto> postTag = comDao.chooseTag();
+		System.out.println("Post Tags: " + postTag);
+		model.addAttribute("postTag", postTag);
+		model.addAttribute("now_id", now_id);
+		model.addAttribute("communityId", communityId);
+		model.addAttribute("communityName", communityName);
 		return "community/communityReg";
+	}
+	
+	@RequestMapping("/communityRegDo")
+	public String communityRegDo(@RequestParam("community_id") int communityId,
+            @RequestParam("post_title") String post_title,
+            @RequestParam("post_text") String post_text,
+            @RequestParam("user_id") String user_id,
+            @RequestParam("post_tag_id") int post_tag_id,  // 태그 ID
+            @RequestParam("file") List<MultipartFile> images, // 다중 이미지 업로드
+            HttpSession session, Model model) {
+		
+		System.out.println("communityReg");
+		
+		PostDto postDto = new PostDto();
+		postDto.setCommunity_id(communityId);
+		postDto.setUser_id(user_id);
+		postDto.setPost_title(post_title);
+		postDto.setPost_text(post_text);
+		postDto.setPost_tag_id(post_tag_id);
+        try {
+            // 게시글 및 이미지 저장
+            comRegService.registerPost(postDto, images);
+        } catch (IOException e) {
+            e.printStackTrace();
+            model.addAttribute("errorMessage", "이미지 업로드 중 오류가 발생했습니다.");
+            return "errorPage";
+        }
+
+        return "redirect:/communityPost?c=" + communityId;
+	}
+	
+	@RequestMapping("/communityDetailDel")
+	public String CommunityDetailDel(@RequestParam("p") String post_id, @RequestParam("c") int comId) {
+		System.out.println("communityDetailDel");
+		System.out.println(post_id);
+		
+		String postNum = comDao.getPostNumById(post_id);
+		
+		comDao.deletePost(post_id);
+		
+		comDao.updatePostNumsAfterDeletion(comId, postNum);
+		
+		return "redirect:/communityPost?c="+comId;
 	}
 	
 	@RequestMapping(value = "/communityUpdate", method = RequestMethod.POST)

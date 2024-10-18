@@ -1,6 +1,5 @@
 package com.tech.whale.community.dto;
 
-import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -18,7 +17,7 @@ public class PostDto {
 	private String user_id;
 	private String post_title;
 	private String post_text;
-	private Date post_date;
+	private String post_date;
 	private String post_url;
 	private int post_cnt;
 	private int post_num;
@@ -29,4 +28,10 @@ public class PostDto {
 	private String post_comments_text;
 	
 	private List<CommentDto> comments;
+	
+	private String post_img_url;
+	private List<PostImgDto> images;
+	
+	private String user_nickname;
+	private String user_image_url;
 }

@@ -33,5 +33,5 @@ public class PostDto {
 	private List<PostImgDto> images;
 	
 	private String user_nickname;
-	private String user_img_url;
+	private String user_image_url;
 }

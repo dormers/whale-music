@@ -1,7 +1,10 @@
 package com.tech.whale.community.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -13,17 +16,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tech.whale.community.dao.ComDao;
 import com.tech.whale.community.dto.CommentDto;
 import com.tech.whale.community.dto.PostDto;
+import com.tech.whale.community.dto.PostImgDto;
 import com.tech.whale.community.service.ComDetailService;
 import com.tech.whale.community.service.ComHomeService;
 import com.tech.whale.community.service.ComLikeCommentService;
 import com.tech.whale.community.service.ComPostService;
 import com.tech.whale.community.service.ComRegService;
 import com.tech.whale.community.service.ComServiceInter;
+import com.tech.whale.community.service.PostUpdateService;
 import com.tech.whale.community.vo.SearchVO;
 
 @Controller
@@ -38,6 +45,9 @@ public class CommunityController {
 	
 	@Autowired
 	private ComRegService comRegService;
+	
+	@Autowired
+	private PostUpdateService postUpdateService;
 	
 	@RequestMapping("/communityHome")
 	public String communityHome(HttpServletRequest request, Model model) {
@@ -212,9 +222,88 @@ public class CommunityController {
 		return "redirect:/communityPost?c="+comId;
 	}
 	
-	@RequestMapping(value = "/communityUpdate", method = RequestMethod.POST)
-	public String communityUpdate(HttpServletRequest request, Model model) {
+	@RequestMapping(value = "/communityUpdate", method = RequestMethod.GET)
+	public String communityUpdate(HttpServletRequest request, HttpSession session, 
+            @RequestParam("p") String postId, 
+            @RequestParam("c") int communityId, Model model) {
 		System.out.println("communityUpdate");
+		
+	    String now_id = (String) session.getAttribute("user_id");
+	    System.out.println("현재 사용자 ID: " + now_id);
+
+	    // 커뮤니티 이름 가져오기
+	    String communityName = comDao.getCommunityName(communityId);
+
+	    // 게시물 정보 가져오기
+	    PostDto post = comDao.getPost(postId);
+	    if (post == null) {
+	        // 게시물이 없는 경우 처리
+	        return "error/noPostFound";
+	    }
+	    
+	    // 게시물에 사용할 태그 리스트 가져오기
+	    List<PostDto> postTag = comDao.chooseTag();
+	    System.out.println("Post Tags: " + postTag);
+
+	    // 모델에 필요한 데이터 추가
+	    model.addAttribute("postTag", postTag);
+	    model.addAttribute("now_id", now_id);
+	    model.addAttribute("communityId", communityId);
+	    model.addAttribute("communityName", communityName);
+	    model.addAttribute("postId", postId);
+	    model.addAttribute("post", post);
+
 		return "community/communityUpdate";
+	}
+	
+	@RequestMapping(value = "/communityUpdateDo", method = RequestMethod.POST)
+	public String communityUpdateDo(HttpServletRequest request, 
+	                                @RequestParam("post_id") int postId, 
+	                                @RequestParam("community_id") int communityId,
+	                                @RequestParam("post_tag_id") int postTagId,
+	                                @RequestParam("post_title") String postTitle,
+	                                @RequestParam("post_text") String postText,
+	                                @RequestParam(value = "file", required = false) List<MultipartFile> newImages,
+	                                RedirectAttributes redirectAttributes) {
+	    
+	    PostDto postDto = new PostDto();
+	    postDto.setPost_id(postId);
+	    postDto.setPost_title(postTitle);
+	    postDto.setPost_text(postText);
+	    postDto.setPost_tag_id(postTagId);
+	    
+	    try {
+	        // 게시물 업데이트 및 새로운 이미지 저장
+	        postUpdateService.updatePostAndInsertImages(postDto, newImages);
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        return "errorPage";
+	    }
+	    
+	    // 업데이트 후 게시물 상세 페이지로 리다이렉트
+	    return "redirect:/communityDetail?c=" + communityId + "&p=" + postId;
+	}
+	
+	@RequestMapping(value = "/deleteImage", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> deleteImage(@RequestParam("imageId") int imageId) {
+	    Map<String, Object> result = new HashMap<>();
+	    try {
+	        // 데이터베이스에서 이미지 삭제 처리
+	        int deleteResult = comDao.deletePostImage(imageId);
+	        
+	        if (deleteResult > 0) {
+	            // 삭제 성공
+	            result.put("success", true);
+	        } else {
+	            // 삭제 실패
+	            result.put("success", false);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        result.put("success", false);
+	    }
+	    
+	    return result; // JSON으로 결과 반환
 	}
 }

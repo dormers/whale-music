@@ -18,7 +18,6 @@ public interface ComDao {
 	public List<PostDto> getPostAll(int start, int end, String sk, int selNum, int comId, int tagId);
 	public List<PostDto> chooseTag();
 	public void regPost(String commid, String user, String text, String title, int postnum, String tagid);
-	public void updatePost(String commid, String text, String title, String postid, String tagid);
 	public PostDto getPostNum(String commid);
 	public PostDto getPost(String post_id);
 	public void cntUpdate(PostDto p);
@@ -45,4 +44,6 @@ public interface ComDao {
     
     public void insertImage(PostImgDto postImgDto);
 	public int getNextPostId();
+	public int deletePostImage(int imageId);
+	public void updatePost(PostDto post);
 }

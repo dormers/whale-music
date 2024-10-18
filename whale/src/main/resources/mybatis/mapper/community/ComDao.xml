@@ -195,4 +195,16 @@
 	    AND POST_NUM > #{postNum}
 	</update>
     
+    <delete id="deletePostImage" parameterType="int">
+	    DELETE FROM POST_IMG WHERE POST_IMG_ID = #{imageId}
+	</delete>
+    
+    <update id="updatePost" parameterType="com.tech.whale.community.dto.PostDto">
+        UPDATE POST
+        SET post_tag_id = #{post_tag_id},
+            post_title = #{post_title},
+            post_text = #{post_text}
+        WHERE post_id = #{post_id}
+    </update>
+    
 </mapper>

@@ -134,7 +134,7 @@
 		<span id="likeCount">${postDetail.likeCount}</span> <!-- 좋아요 수 표시 -->
 	</form>
     <c:if test="${postDetail.user_id eq now_id}">
-        <a href="communityDetailUpdate?p=${postDetail.post_id }" class="btn">수정</a>
+        <a href="communityUpdate?c=${param.c }&p=${postDetail.post_id }" class="btn">수정</a>
         <a href="communityDetailDel?c=${param.c }&p=${postDetail.post_id }" class="btn">삭제</a>
     </c:if>
 

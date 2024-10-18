@@ -1,13 +1,11 @@
 package com.tech.whale.community.dto;
 
-import java.util.Date;
-
 public class CommentDto {
 	private String post_comments_id;
 
 	private String user_id;
     private String post_comments_text;
-    private Date post_comments_date;
+    private String post_comments_date;
     
     
     
@@ -29,10 +27,10 @@ public class CommentDto {
 	public void setPost_comments_text(String post_comments_text) {
 		this.post_comments_text = post_comments_text;
 	}
-	public Date getPost_comments_date() {
+	public String getPost_comments_date() {
 		return post_comments_date;
 	}
-	public void setPost_comments_date(Date post_comments_date) {
+	public void setPost_comments_date(String post_comments_date) {
 		this.post_comments_date = post_comments_date;
 	}
     

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.tech.whale.community.dto.CommentDto;
 import com.tech.whale.community.dto.CommunityDto;
 import com.tech.whale.community.dto.PostDto;
+import com.tech.whale.community.dto.PostImgDto;
 
 @Mapper
 public interface ComDao {
@@ -24,7 +25,10 @@ public interface ComDao {
 	public int selectBoardCount(String sk, int selNum, int comId, int tagId);
 	public String getCommunityName(int communityId);
 	public void upCnt(String post_id);
+	public void deletePost(String post_id);
 	
+	public String getPostNumById(String post_id);
+	public void updatePostNumsAfterDeletion(int communityId, String postNum);
 	
     public int checkUserLikedPost(String postId, String userId);
 
@@ -36,4 +40,9 @@ public interface ComDao {
 
     // 게시글의 총 좋아요 수 가져오기
     public int getLikeCount(String postId);
+    
+    public void insertPost(PostDto postDto);
+    
+    public void insertImage(PostImgDto postImgDto);
+	public int getNextPostId();
 }

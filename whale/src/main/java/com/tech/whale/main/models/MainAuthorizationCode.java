@@ -1,4 +1,4 @@
-package com.tech.whale.main.models.spotify;
+package com.tech.whale.main.models;
 
 import java.net.URI;
 import java.util.concurrent.CancellationException;

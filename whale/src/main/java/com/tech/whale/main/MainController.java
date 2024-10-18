@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.tech.whale.main.controllers.spotify.MainAuthorizationCodeController;
-import com.tech.whale.main.models.spotify.MainAuthorizationCode;
+import com.tech.whale.main.models.MainAuthorizationCode;
+import com.tech.whale.main.service.MainAuthorizationCodeController;
 
 @Controller
 public class MainController {

@@ -1,4 +1,4 @@
-package com.tech.whale.main.controllers.spotify;
+package com.tech.whale.main.service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -6,7 +6,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 
 import com.tech.whale.main.MainCommand;
-import com.tech.whale.main.models.spotify.MainAuthorizationCode;
+import com.tech.whale.main.models.MainAuthorizationCode;
 
 @Service
 public class MainAuthorizationCodeController implements MainCommand {

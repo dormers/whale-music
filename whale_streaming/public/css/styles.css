@@ -1,15 +1,37 @@
-* {margin: 0; padding: 0; box-sizing: 0;}
-body {min-height: 100vh;}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: 0;
+}
+body {
+  min-height: 100vh;
+}
 
-.flexCenter {display: flex; justify-content: center; align-items: center;}
+.flexCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-.header {display: flex; justify-content: center; width: 100%; height: 90px; background-color: #1f1f1f; border-bottom: 1.5px solid #cecece;}
-.headerItems {width: 170px;}
+.header {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 90px;
+  background-color: #1f1f1f;
+  border-bottom: 1.5px solid #cecece;
+}
+.headerItems {
+  width: 170px;
+}
 
-.main {width: 100%; background-color: #1f1f1f;}
+.main {
+  width: 100%;
+  background-color: #1f1f1f;
+}
 
-/* 로그인 및 회원가입 폼 스타일 */
-.loginJoin {
+/* 로그인 및 회원가입, 아이디/비밀번호 찾기 폼 스타일 */
+.loginJoin, .findBox, .resetBox{
   width: 45%;
   height: 90%;
   background-color: #202020;
@@ -17,9 +39,9 @@ body {min-height: 100vh;}
   border-radius: 100px;
   font-family: Arial, sans-serif;
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
 }
-.loginJoin-container {
+.loginJoin-container, .findBox-container, .resetBox-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -28,7 +50,7 @@ body {min-height: 100vh;}
   background-color: #2e2e2e;
   border-radius: 40px;
 }
-.loginJoin-title {
+.loginJoin-title, .findBox-title, .resetBox-title {
   font-size: 24px;
   font-weight: 500;
   letter-spacing: 0.2px;
@@ -58,20 +80,17 @@ button[type="submit"] {
   letter-spacing: 0.2px;
 }
 
-button#start-register {
-  margin-top: 25px;
-  padding: 5px 10px;
-  background-color: #cecece;
-  border: 1px solid #282828;
-  border-radius: 5px;
-  color: #2e2e2e;
+button#start-register, button#start-find {
+  color: #cecece;
+  text-decoration: none;
+  font-size: 12px;
+  border: none;
+  outline: none;
+  background-color: inherit;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
 }
 
-.loginJoin-footer {
+.loginJoin-footer, .loginForgot-footer {
   font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.2px;

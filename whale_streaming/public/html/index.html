@@ -22,7 +22,8 @@
           <input type="password" id="password" placeholder="비밀번호" required><br>
           <button type="submit" value="whale">로그인</button><br>
         </form>
-        <p class="loginJoin-footer">계정이 없으신가요?&nbsp;&nbsp;<a><button id="start-register">회원가입</button></a></p>        
+        <p class="loginJoin-footer">계정이 없으신가요?&nbsp;&nbsp;<button id="start-register">회원가입</button></p>        
+        <p class="loginForgot-footer">계정을 잊어버리셨나요?&nbsp;&nbsp;<button id="start-find">아이디/비밀번호 찾기</button></p>        
         <div id="message"></div>
       </div>
     </div>
@@ -52,6 +53,10 @@
         }
       });
     });
-  });
+
+    $('#start-find').on('click', function() {
+      window.location.href = '/whale/find';
+      });
+    });
 </script>
 </html>

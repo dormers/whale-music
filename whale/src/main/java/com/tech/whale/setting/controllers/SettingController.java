@@ -457,47 +457,6 @@ public class SettingController {
         return "success";
     }
 
-    @RequestMapping("/blockList")
-    public String blockList(HttpSession session, Model model) {
-        System.out.println("blockList() ctr");
-
-        String session_user_id = (String) session.getAttribute("user_id");
-
-//      DB의 block_user_id에 데이터가 콤마 형식으로 들어올 경우 DB 상에서 콤마를 구분자로 이름을 추출하고, 그 이름의 아이디, 이미지 사진을 가져올 수 있도록 수정해야 함
-
-//      차단된 회원의 아이디, 닉네임, 프로필 사진을 가져와서 blocklist에 저장하기
-        List<BlockDto> bloclist = settingDao.getBlockList(session_user_id);
-        model.addAttribute("blockList", bloclist);
-
-        // debug
-        for (BlockDto blockDto : bloclist) {
-            System.out.println(blockDto.getUser_id());
-            System.out.println(blockDto.getUser_image_url());
-            System.out.println(blockDto.getUser_nickname());
-        }
-
-        return "setting/blockList";
-    }
-
-    @PostMapping("/unblockUser")
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> unblockUser(@RequestParam("user_id") String block_userId, HttpSession session) {
-        System.out.println("unblockUser() ctr");
-        System.out.println("차단 해제 요청 수신됨. 차단 당할 사용자 ID: " + block_userId); // debug
-
-        String session_user_id = (String) session.getAttribute("user_id");
-        System.out.println("세션 사용자 ID: " + session_user_id); // debug
-
-        // 차단 해제
-        settingDao.unblockUser(session_user_id, block_userId);
-        System.out.println("차단 해제 성공"); // debug
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "차단 해제 성공");
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @RequestMapping("/accessibility")
     public String accessibility(HttpSession session, Model model) {
         System.out.println("accessibility() ctr");

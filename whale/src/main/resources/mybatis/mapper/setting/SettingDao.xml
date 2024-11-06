@@ -67,38 +67,6 @@
 	<select id="getAccountPrivacyByUserId" resultType="com.tech.whale.setting.dto.UserSettingDto">
 		SELECT ACCOUNT_PRIVACY FROM USER_SETTING WHERE USER_ID = #{session_user_id}
 	</select>
-	<select id="getBlockList" parameterType="String" resultType="com.tech.whale.setting.dto.BlockDto">
-        <![CDATA[
-		SELECT
-			UI.USER_ID,
-			UI.USER_NICKNAME,
-			UI.USER_IMAGE_URL
-		FROM (
-				 SELECT REGEXP_SUBSTR(BLOCK_USER_ID, '[^,]+', 1, LEVEL) AS BLOCK_USER_ID
-				 FROM (
-						  SELECT BLOCK_USER_ID
-						  FROM BLOCK
-						  WHERE USER_ID = #{session_user_id}
-					  )
-					 CONNECT BY LEVEL <= LENGTH(BLOCK_USER_ID)
-                            - LENGTH(REPLACE(BLOCK_USER_ID, ',', '')) + 1
-			 ) B
-				 JOIN USER_INFO UI
-					  ON B.BLOCK_USER_ID = UI.USER_ID
-		]]>
-   </select>
-	<update id="unblockUser" parameterType="map">
-		UPDATE BLOCK
-		SET BLOCK_USER_ID = NULLIF(
-				TRIM(BOTH ',' FROM REPLACE(
-						',' || BLOCK_USER_ID || ',',
-						',' || #{block_userId} || ',',
-						','
-								   )),
-				''
-							)
-		WHERE USER_ID = #{session_user_id}
-	</update>
 	<select id="getDarkmode" resultType="com.tech.whale.setting.dto.UserSettingDto">
 		SELECT DARKMODE_SETTING_ONOFF FROM USER_SETTING WHERE USER_ID = #{session_user_id}
 	</select>
@@ -166,7 +134,7 @@
 	<select id="getFilteredPostLikeList" parameterType="map" resultType="com.tech.whale.setting.dto.LikeListDto">
 		<choose>
 			<when test="postType == '게시글'">
-				SELECT P.POST_ID, P.COMMUNITY_ID, P.POST_TITLE, P.POST_TEXT, PT.POST_TAG_TEXT
+				SELECT P.POST_ID, P.COMMUNITY_ID, P.POST_TITLE, P.POST_TEXT, PT.POST_TAG_TEXT, P.USER_ID
 				FROM POST P JOIN POST_LIKE PL
 				ON P.POST_ID = PL.POST_ID
 				JOIN POST_TAG PT

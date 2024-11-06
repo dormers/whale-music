@@ -38,5 +38,26 @@
 	    WHERE message_room_id = #{roomId}
 	    ORDER BY message_create_date ASC
 	</select>
+
+	<select id="getFollowList" resultType="com.tech.whale.message.dto.FollowListDto">
+		<![CDATA[
+		SELECT
+		UI.USER_ID AS FOLLOW_USER_ID,
+		UI.USER_NICKNAME AS FOLLOW_USER_NICKNAME,
+		UI.USER_IMAGE_URL AS FOLLOW_USER_IMAGE_URL
+		FROM (
+		SELECT REGEXP_SUBSTR(FOLLOW_USER_ID, '[^,]+', 1, LEVEL) AS FOLLOW_USER_ID
+		FROM (
+		SELECT FOLLOW_USER_ID
+		FROM FOLLOW
+		WHERE USER_ID = #{now_id}
+		)
+		CONNECT BY LEVEL <= LENGTH(FOLLOW_USER_ID)
+		- LENGTH(REPLACE(FOLLOW_USER_ID, ',', '')) + 1
+		) B
+		JOIN USER_INFO UI
+		ON B.FOLLOW_USER_ID = UI.USER_ID
+		]]>
+	</select>
 	    
 </mapper>

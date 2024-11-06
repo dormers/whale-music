@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.tech.whale.message.dto.FollowListDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,11 +23,34 @@ public class MessageController {
 	@Autowired
 	private MessageDao messageDao;
 	
-	@RequestMapping("/messageHome")
+	@RequestMapping("/message/home")
 	public String messageHome(HttpServletRequest request, HttpSession session, Model model) {
+		System.out.println("maeeageHome() ctr");
 		String now_id = (String) session.getAttribute("user_id");
+
+		model.addAttribute("now_id", now_id);
 		
-		return "message/messageHome";
+		return "message/home";
+	}
+
+	@RequestMapping("/message/newChat")
+	public String newChat(HttpServletRequest request, HttpSession session, Model model) {
+		System.out.println("newChat() ctr");
+		String now_id = (String) session.getAttribute("user_id");
+
+		List<FollowListDto> followList = messageDao.getFollowList(now_id);
+
+		//debug
+		for (FollowListDto followListDto : followList) {
+			System.out.println(followListDto.getFollow_user_id());
+			System.out.println(followListDto.getFollow_user_nickname());
+			System.out.println(followListDto.getFollow_user_image_url());
+			System.out.println("--------------------");
+		}
+
+		model.addAttribute("followList", followList);
+
+		return "/message/newChat";
 	}
 	
 	@RequestMapping("/messageGo")

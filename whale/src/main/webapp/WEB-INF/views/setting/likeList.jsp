@@ -200,10 +200,6 @@
                             <c:when test="${selectedPostType == '게시글'}">
                                 <c:forEach var="post" items="${postLikeList }">
                                     <a href="/whale/communityDetail?c=${post.community_id}&p=${post.post_id}">
-                                            <%--									<div class="post-list">--%>
-                                            <%--										<div>${post.post_tag_text}&nbsp;${post.post_title}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${post.user_id}</div>--%>
-                                            <%--										<div>${post.post_text}</div>--%>
-                                            <%--									</div>--%>
                                         <div class="post-list">
                                             <div class="post-list-writer">
                                                 <div>${post.post_tag_text}&nbsp;${post.post_title}</div>

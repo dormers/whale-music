@@ -102,7 +102,8 @@
 		}
 
 		#feed-list {
-			margin: 20px;
+			margin-left: 20px;
+			margin-right: 20px;
 		}
 
 		.feed-item {
@@ -126,12 +127,17 @@
 		.comments-section {
 			margin-top: 10px;
 			padding-left: 10px;
+			margin-bottom: 10px;
 		}
 
 		.comment, .reply {
 			display: flex;
 			align-items: center;
 			margin-bottom: 5px;
+		}
+
+		.reply {
+			margin-left: 40px;
 		}
 
 		.comment-img, .reply-img, .owner-image {
@@ -215,9 +221,9 @@
 											<div class="comments-section">
 												<c:forEach var="comment" items="${feedCommentList}">
 													<c:if test="${feed.feed_id == comment.re_feed_id}">
-														<div class="comment">
+														<div class="${comment.re_parent_comments_id != null ? 'reply' : 'comment'}">
 															<img src="static/images/setting/${comment.re_commenter_image}" alt="commenter_img" class="comment-img">
-															<div class="comment-text<c:choose> <c:when test="${comment.re_parent_comments_id != null}">" style="margin-left: 40px</c:when><c:otherwise></c:otherwise></c:choose>">
+															<div class="comment-text">
 																<span>${comment.re_commenter_id}</span>: ${comment.re_feed_comments_text}
 															</div>
 														</div>

@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import com.tech.whale.admin.dao.AdminIDao;
 import com.tech.whale.admin.dto.AdminPFCDto;
 import com.tech.whale.admin.util.AdminSearchVO;
-import com.tech.whale.community.vo.SearchVO;
 
 @Service
 public class AdminUserInfoFeedService implements AdminServiceInter{
@@ -25,11 +24,11 @@ public class AdminUserInfoFeedService implements AdminServiceInter{
 		Map<String, Object> map = model.asMap();
 		HttpServletRequest request = 
 				(HttpServletRequest) map.get("request");
-		SearchVO searchVO = (SearchVO) map.get("searchVO");
+		AdminSearchVO searchVO = (AdminSearchVO) map.get("searchVO");
 		String userId = request.getParameter("userId");
 
 		if (searchVO == null) {
-		    searchVO = new SearchVO();
+		    searchVO = new AdminSearchVO();
 		    model.addAttribute("searchVO", searchVO);
 		}
 		

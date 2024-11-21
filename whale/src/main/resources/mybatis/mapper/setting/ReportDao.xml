@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tech.whale.setting.dao.ReportDao">
+	<insert id="reportPost">
+		INSERT INTO REPORT
+		(REPORT_ID, USER_ID, POST_ID, REPORT_WHY,
+		REPORT_DATE, REPORT_TAG, REPORT_TEXT, REPORT_USER_ID)
+		VALUES 
+		(REPORT_SEQ.NEXTVAL, #{now_id}, #{report_type_id},
+		#{report_why}, SYSDATE, #{report_tag}, #{reportText}, #{userId})
+	</insert>
+	
+	<insert id="reportFeed">
+		INSERT INTO REPORT
+		(REPORT_ID, USER_ID, FEED_ID, REPORT_WHY,
+		REPORT_DATE, REPORT_TAG, REPORT_TEXT, REPORT_IMG_URL, REPORT_USER_ID)
+		VALUES 
+		(REPORT_SEQ.NEXTVAL, #{now_id}, #{report_type_id},
+		#{report_why}, SYSDATE, #{report_tag}, #{reportText}, #{reportImg}, #{userId})
+	</insert>
+	
+	<insert id="reportFeedComments">
+		INSERT INTO REPORT
+		(REPORT_ID, USER_ID, FEED_COMMENT_ID, REPORT_WHY,
+		REPORT_DATE, REPORT_TAG, REPORT_TEXT, REPORT_USER_ID)
+		VALUES
+		(REPORT_SEQ.NEXTVAL, #{now_id}, #{report_type_id},
+		#{report_why}, SYSDATE, #{report_tag}, #{reportText}, #{userId})
+	</insert>
+	
+	<insert id="reportPostComments">
+		INSERT INTO REPORT
+		(REPORT_ID, USER_ID, POST_COMMENT_ID, REPORT_WHY,
+		REPORT_DATE, REPORT_TAG, REPORT_TEXT, REPORT_USER_ID)
+		VALUES
+		(REPORT_SEQ.NEXTVAL, #{now_id}, #{report_type_id},
+		#{report_why}, SYSDATE, #{report_tag}, #{reportText}, #{userId})
+	</insert>
+	
+	<insert id="reportMessage">
+		INSERT INTO REPORT
+		(REPORT_ID, USER_ID, MESSAGE_ID, REPORT_WHY,
+		REPORT_DATE, REPORT_TAG, REPORT_TEXT, REPORT_USER_ID)
+		VALUES
+		(REPORT_SEQ.NEXTVAL, #{now_id}, #{report_type_id},
+		#{report_why}, SYSDATE, #{report_tag}, #{reportText}, #{userId})
+	</insert>
+	
+	<select id="getReportPost" resultType="com.tech.whale.setting.dto.ReportDto">
+		SELECT POST_TEXT AS REPORT_TEXT
+		FROM POST
+		WHERE POST_ID = #{report_type_id}
+	</select>
+	
+	<select id="getReportFeed" resultType="com.tech.whale.setting.dto.ReportDto">
+		SELECT F.FEED_TEXT AS REPORT_TEXT, FI.FEED_IMG_URL AS REPORT_IMG_URL
+		FROM FEED F
+		JOIN FEED_IMG FI
+		ON F.FEED_ID = FI.FEED_ID
+		WHERE F.FEED_ID = #{report_type_id}
+	</select>
+	
+	<select id="getReportFeedComments" resultType="com.tech.whale.setting.dto.ReportDto">
+		SELECT FEED_COMMENTS_TEXT AS REPORT_TEXT FROM FEED_COMMENTS
+		WHERE FEED_COMMENTS_ID = #{report_type_id}
+	</select>
+	
+	<select id="getReportPostComments" resultType="com.tech.whale.setting.dto.ReportDto">
+		SELECT POST_COMMENTS_TEXT AS REPORT_TEXT FROM POST_COMMENTS
+		WHERE POST_COMMENTS_ID = #{report_type_id}
+	</select>
+	
+	<select id="getReportMessage" resultType="com.tech.whale.setting.dto.ReportDto">
+		SELECT MESSAGE_TEXT AS REPORT_TEXT FROM MESSAGE
+		WHERE MESSAGE_ID = #{report_type_id}
+	</select>
+
+	<select id="getPostUser" resultType="String">
+		SELECT USER_ID FROM POST WHERE POST_ID = #{post_id}
+	</select>
+	
+	<select id="getFeedUser" resultType="String">
+		SELECT USER_ID FROM FEED WHERE FEED_ID = #{feed_id}
+	</select>
+	
+	<select id="getFeedCommentsUser" resultType="String">
+		SELECT USER_ID FROM FEED_COMMENTS WHERE FEED_COMMENTS_ID = #{feed_comments_id}
+	</select>
+
+	<select id="getPostCommentsUser" resultType="String">
+		SELECT USER_ID FROM POST_COMMENTS WHERE POST_COMMENTS_ID = #{post_comments_id}
+	</select>
+
+	<select id="getMessageUser" resultType="String">
+		SELECT USER_ID FROM MESSAGE WHERE MESSAGE_ID = #{message_id}
+	</select>
+
+
+</mapper>

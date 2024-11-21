@@ -15,7 +15,7 @@
 <body>
 	<div class="header">
 	    <div class="headerItems flexCenter">
-	        <img src="static/images/login/whaleLogo.png" alt="Music Whale Logo" height="80px">
+	        <img src="static/images/login/whaleLogo.png" alt="Music Whale Logo" id="whale-logo" height="80px" onclick="location.href=`<%= request.getContextPath() %>/`">
 	    </div>
 	</div>
 	<div class="main flexCenter">
@@ -58,7 +58,11 @@
 	        });
 	
 	        if (`${message}` === "false") {
-	            message.innerText = "아이디 또는 비밀번호가 올바르지 않습니다.";
+	            message.innerText = "아이디 또는 비밀번호가 올바르지 않습니다."
+	        } else if (`${message}` === "suspension") {
+	        	const messageDate = new Date(`${ date }`.replace('KST ',''));
+	        	const result = messageDate.getFullYear()+'.'+String(messageDate.getDay()).padStart(2, "0")+'.'+String(messageDate.getDate()).padStart(2, "0")+' '+String(messageDate.getHours()).padStart(2, "0")+":"+String(messageDate.getMinutes()).padStart(2, "0")+":"+String(messageDate.getSeconds()).padStart(2, "0");
+	            message.innerText = `규칙 위반으로 인하여 아이디가 정지되었습니다.\n정지 기간: \${ result }`
 	        }
 	    });
 	</script>

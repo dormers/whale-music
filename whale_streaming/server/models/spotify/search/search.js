@@ -7,7 +7,7 @@ async function search(req,res){
     const encodedQuery = encodeURIComponent(query);
 
     return (await fetchSpotify.fetchWebApi(
-        `v1/search?q=${encodedQuery}&type=${type}`, 'GET'
+        req,`v1/search?q=${encodedQuery}&type=artist%2Calbum%2Ctrack%2Cplaylist`, 'GET'
     ));
 }
 

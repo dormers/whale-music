@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tech.whale.feed.dao.FeedCommentDao">
+
+<select id="isCommentLikedByUser" resultType="int">
+	SELECT COUNT(*) FROM FEED_COMMENTS_LIKE
+	WHERE FEED_COMMENTS_ID = #{commentId}
+	AND USER_ID = #{userId}
+</select>
+
+<insert id="insertCommentLike">
+	INSERT INTO FEED_COMMENTS_LIKE (FEED_COMMENTS_LIKE_ID, USER_ID, FEED_COMMENTS_ID)
+	VALUES (FEED_COMMENTS_LIKE_SEQ.NEXTVAL, #{userId}, #{commentId})
+</insert>
+
+<delete id="deleteCommentLike">
+	DELETE FROM FEED_COMMENTS_LIKE
+	WHERE FEED_COMMENTS_ID = #{commentId}
+	AND USER_ID = #{userId}
+</delete>
+
+<select id="getCommentLikeCount" resultType="int">
+	SELECT COUNT(*) FROM FEED_COMMENTS_LIKE
+	WHERE FEED_COMMENTS_ID = #{commentId}
+</select>
+
+<insert id="insertReply" parameterType="com.tech.whale.feed.dto.FeedCommentDto">
+    INSERT INTO feed_comments (
+        feed_comments_id,
+        feed_id,
+        user_id,
+        feed_comments_text,
+        feed_comments_date,
+        parent_comments_id
+    ) VALUES (
+        feed_comments_seq.NEXTVAL,
+        #{feed_id},
+        #{user_id},
+        #{feed_comments_text},
+        SYSDATE,
+        #{parent_comments_id}
+    )
+</insert>
+
+<select id="getRepliesForComment" resultType="com.tech.whale.feed.dto.FeedCommentDto">
+    SELECT 
+        fc.feed_comments_id, 
+        fc.feed_id,
+        fc.user_id, 
+        fc.feed_comments_text, 
+        TO_CHAR(fc.feed_comments_date, 'YYYY"년" MM"월" DD"일" HH24"시 "MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS feed_comments_date,
+        fc.parent_comments_id,
+        ui.user_image_url,
+        COALESCE(COUNT(fl.feed_comments_id), 0) AS likeCount -- 좋아요 수 추가
+    FROM 
+        feed_comments fc
+    JOIN 
+        user_info ui ON fc.user_id = ui.user_id
+    LEFT JOIN 
+        feed_comments_like fl ON fc.feed_comments_id = fl.feed_comments_id
+    WHERE 
+        fc.parent_comments_id = #{commentId}
+    GROUP BY 
+        fc.feed_comments_id, fc.feed_id, fc.user_id, fc.feed_comments_text, fc.feed_comments_date, fc.parent_comments_id, ui.user_image_url
+    ORDER BY 
+        fc.feed_comments_date ASC
+</select>
+
+<resultMap id="CommentResultMap" type="com.tech.whale.feed.dto.FeedCommentDto">
+    <id property="feed_comments_id" column="feed_comments_id"/>
+    <result property="feed_id" column="feed_id"/>
+    <result property="user_id" column="user_id"/>
+    <result property="feed_comments_text" column="feed_comments_text"/>
+    <result property="feed_comments_date" column="feed_comments_date"/>
+    <result property="parent_comments_id" column="parent_comments_id"/>
+    <result property="user_image_url" column="user_image_url"/>
+    <result property="likeCount" column="like_count"/>
+    <result property="likedByCurrentUser" column="liked_by_current_user"/>
+</resultMap>
+
+</mapper>

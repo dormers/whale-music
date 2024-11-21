@@ -35,21 +35,22 @@ public class AdminAccountUserListService implements AdminServiceInter{
 		String user_id = "";
 	    String user_email = "";
 	 	
-		//search
-		String[] brdTitle = request.getParameterValues("searchType");
+		String brdTitle = request.getParameter("searchType");
+		String searchOrderBy = request.getParameter("searchOrderBy");		
+		if(searchOrderBy == null || searchOrderBy.trim().isEmpty()) {
+			searchOrderBy="USER_STATUS";
+		}
 		
-		if (brdTitle == null) {
+		if (brdTitle == null || brdTitle.trim().isEmpty()) {
 	        user_id = "user_id";
 	        model.addAttribute("user_id", "true");
 	    } else if(brdTitle != null) {
-			for (String val : brdTitle) {
-				if(val.equals("user_id")) {
-					model.addAttribute("user_id", "true");
-					user_id="user_id";
-				}else if(val.equals("user_email")) {
-					model.addAttribute("user_email", "true");
-					user_email="user_email";
-				}
+			if(brdTitle.equals("user_id")) {
+				model.addAttribute("user_id", "true");
+				user_id="user_id";
+			}else if(brdTitle.equals("user_email")) {
+				model.addAttribute("user_email", "true");
+				user_email="user_email";
 			}
 		}
 		String searchKeyword = request.getParameter("sk");
@@ -57,8 +58,6 @@ public class AdminAccountUserListService implements AdminServiceInter{
 			searchKeyword = "";
 		}
 
-		
-		//------------ 검색후에 조건들-------------
 		int total = 0;
 		if(user_id.equals("user_id")) {
 			total = adminIDao.selectUserCnt(searchKeyword,"1");
@@ -68,7 +67,6 @@ public class AdminAccountUserListService implements AdminServiceInter{
 		
 		String strPage = request.getParameter("page");
 		
-	 // null검사
  		if(strPage == null || strPage.isEmpty()) {
  			strPage="1";
  		}
@@ -76,7 +74,6 @@ public class AdminAccountUserListService implements AdminServiceInter{
 		int page = Integer.parseInt(strPage);
 		searchVO.setPage(page);
 		
-		//글의 총갯수
 		searchVO.pageCalculate(total);
 		
 		int rowStart = searchVO.getRowStart();
@@ -84,18 +81,20 @@ public class AdminAccountUserListService implements AdminServiceInter{
 		
 		ArrayList<AdminUserInfoDto> list = null;
 		if(user_id.equals("user_id")) {
-			list = adminIDao.adminUserList(rowStart,rowEnd, searchKeyword,"1");
+			list = adminIDao.adminUserList(rowStart,rowEnd, searchKeyword,"1",searchOrderBy);
 		}else if(user_email.equals("user_email")) {
-			list = adminIDao.adminUserList(rowStart,rowEnd,searchKeyword,"2");
+			list = adminIDao.adminUserList(rowStart,rowEnd,searchKeyword,"2",searchOrderBy);
 		}
 		
-
-		
+		model.addAttribute("search_order_By", searchOrderBy);
+		model.addAttribute("searchKeyword", searchKeyword);
+		model.addAttribute("searchType", brdTitle);
 		model.addAttribute("list", list);
 		model.addAttribute("ultotRowcnt", total);
 		model.addAttribute("ulsearchVO", searchVO);
 		
-		
 	}
+	
+	
 	
 }

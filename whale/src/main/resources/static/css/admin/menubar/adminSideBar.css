@@ -9,22 +9,44 @@ body{
 }
 
 .adminSideBar {
-	
+	position: fixed;
+	overflow-x: auto;
+    overflow-y: hidden;
+    height: 100vh;
     width: 200px;
-    height: auto;
+    /* height: auto; */
     background-color: #293846;
     color: white;
     left: 0;
-    top: 0;
+    top: 80px;
     z-index: 100;
+    
 }
+.proImgBox {
+	height:80px; 
+	width:80px; 
+	border-radius: 50%;
+	background-color: #fff; 
+	margin: 0 auto;
+	cursor: pointer;
+}
+.proImg{
+	height:80px; 
+	width:80px; 
+	border-radius: 50%;
+}
+
 .adminSideBar ul {
     list-style: none;
     margin:0;
+    padding: 10px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
 }
 .adminSideBar ul li {
-	padding: 0 0 0 5px;
-    margin: 5px 0px;
+	font-size: 18px;
 }
 .adminSideBar a{
 	color: #aaa;
@@ -35,5 +57,19 @@ body{
 	text-decoration: nuderline;
 }
 .logoutstr{
-	margin: 10px 60px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 20px auto 0 auto;
+	text-align: center;
+}
+.profile-container{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 45px;
+}
+.profile{
+	padding: 30px 50px;
+	border-bottom: 1px solid rgb(96, 96, 96);
 }

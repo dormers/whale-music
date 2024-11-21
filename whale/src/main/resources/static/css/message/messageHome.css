@@ -1,301 +1,40 @@
 @charset "UTF-8";
 
-html {
-	font-size: clamp(14px, 1.5vw, 24px); /*최소,중간,최대값*/
-}
-
-.message-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: calc(100% - 1.5px);
-	border: 1.5px solid #E2E2E2;
-	border-radius: 30px;
-	background-color: #f2f2f2;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 20px;
-	font-size: 2.2rem;
-	overflow: auto; /* 내용이 많아지면 스크롤생성 */
-}
-
-.message-container * {
-	width: 90%;
-}
-/* =======검색창======= */
-#search {
-	display: flex;
-	background-color: #D9D9D9;
-	flex-direction: row;
-	height: 48px;
-	border-radius: 20px;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-}
-
-#beforePage {
-	border: none;
-	background-color: transparent;
-	justify-content: flex-start;
-	width: 10%;
-}
-
-#searchInput {
-	border: none;
-	background-color: transparent; /* 투명 */
-	justify-content: center;
-	width: 80%;
-	font-size: 2.2rem;
-	font-weight: bold;
-	outline: none;
-	background-color: transparent; /* 클릭 시 테두리 없애기 */
-}
-
-#searchBtn {
-	border: none;
-	background-color: transparent;
-	justify-content: flex-end;
-	width: 10%;
-}
-
-#search img {
-	width: 35px;
-	height: 35px;
-}
-/* 타이틀 */
-#title {
-	font-size: 2.2rem;
-	font-weight: bold;
-	text-align: left;
-	position: relative;
-	top: 20px;
-}
-
-#title::after {
-	content: ""; /* 내용 없이 가상 요소 생성 */
-	display: block; /* 블록으로 설정하여 공간 차지 */
-	height: 20px; /* 원하는 여백 높이 설정 */
-}
-/* =======테이블======= */
-table {
-	table-layout: fixed;
-	min-width: 100%; /* 최소 너비를 100%로 설정 */
-	position: relative;
-	border-spacing: 0 30px;
-}
-
-.col1 {
-	width: 100px;
-}
-
-.col2 {
-	width: auto;
-}
-
-.col3 {
-	width: 70px;
-}
-
-.col4 {
-	width: 5px;
-}
-
-#msgTable tr:hover .col4 {
-	visibility: visible;
-}
-
-#msgTable tr:not(hover) .col4 {
-	visibility: hidden;
-}
-
-#chatInfo1 {
-	list-style-type: none;
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-}
-
-#chatInfo2 {
-	list-style-type: none;
-	display: flex;
-	flex-direction: column;
-}
-
-li {
-	overflow: hidden; /* 넘치는 내용 숨기기 */
-	white-space: nowrap; /* 줄 바꿈 방지 */
-	text-overflow: ellipsis; /* 잘린 부분에 ... 표시하기 */
-}
-
-.profileImg {
-	width: 70px;
-	height: 70px;
-	border-radius: 50px;
-	background-color: white;
-}
-
-.username {
-	font-weight: bold;
-	font-size: 1.6rem;
-}
-
-#nowMsg {
-	font-weight: bold;
-	font-size: 1.1rem;
-	width: 100%;
-	color: gray;
-}
-
-#msgTime {
-	font-weight: bold;
-	font-size: 0.9rem;
-	color: gray;
-}
-
-#unread span {
-	background-color: rgb(194, 194, 194);;
-	color: black;
-	font-weight: bold;
-	font-size: 1rem;
-	text-align: center;
-	display: inline-flex; justify-content : center; align-items : center;
-	width: 2rem;
-	height: 2rem;
-	border-radius: 50%;
-	justify-content: center;
-	align-items: center;
-}
-
-#dotImg {
-	height: 35px;
-	width: auto;
-}
-
-/* =======Search======= */
-#tabs {
-	list-style-type: none;
-	padding: 0;
-	display: flex;
-	flex-direction: row;
-	width: 90%;
-	justify-content: center;
-	text-align: center;
-	margin-top: 20px;
-	font-weight: bold;
-}
-
-.tab {
-	cursor: pointer; /* 마우스커서 모양변경 */
-	background: none;
-	position: relative; /* 위치 설정 */
-	overflow: visible;
-}
-
-.tab.now::after {
-	content: ''; /* 내용. 없더라도 표기. 가상요소 생성을 위한것 */
-	display: block; /* 새로운 줄에서 시작하고 전체 너비를 차지 */
-	width: 8rem; /* 선길이 */
-	height: 5px; /* 두께 */
-	background: black; /* 색상 */
-	position: absolute;
-	left: 50%; /* 가운데 정렬을 위해 */
-	transform: translateX(-50%); /* 가운데 정렬을 위해 이동 */
-	bottom: -0.5rem;
-	border-radius: 10px;
-}
-
-#result {
-	width: 100%;
-	border: none;
-	margin-top: 20px;
-}
-/* =======UserTable=======*/
-/* 체크박스 커스텀*/
-/* 요소를 숨기는 class. */
-.box {
-    position: absolute;
-    clip: rect(0 0 0 0); /* 요소를 숨기고 공간도 없앰. hidden은 공간유지. */
-    width: 1px;
-    height: 1px;
-    overflow: hidden; /* 요소의 크기를 넘어서는 콘텐츠는 보이지 않게됨*/
-}
-
-/* 체크를 안 했을 때 */
-.userCheckbox {
-    display: flex;
-    align-items: center;
-    cursor: pointer; /* 커서 포인터로 변경 */
-    position: relative;
-}
-
-.userCheckbox span {
-    display: inline-block;
-    width: 20px; /* 체크박스 크기 */
-    height: 20px; /* 체크박스 크기 */
-    margin-right: 10px; /* label과의 여백 */
-    background-color: transparent; /* 기본 배경 투명 */
-    border: 2px solid #ccc; /* 테두리 추가 */
-    border-radius: 50%; /* 모서리 둥글게 */
-}
-
-.userCheckbox:hover span {
-    background-color: #9f9f9f; /* 배경색을 변경 */
-    transform: scale(1.2); /* 약간 확대 */
-}
-
-/* 체크했을 때 */
-.box:checked + span { /* +는 형제요소 선택 */
-    background-image: url("../../images/message/check.png"); /* 체크 상태의 이미지 */
-	background-color : #b3b3b3;
-	background-size : 20px 20px;
-	background-repeat: no-repeat;
-	background-position: center;
-}
-
-/* 확인버튼 */
-#confirmButton{
-	display: none;
-	position: absolute;
-	bottom: 20%;
-	left: 50%; /* 가로 중앙에 위치 */
-	transform: translateX(-50%); /* 중앙 정렬 */
-    border: none;
-    display: inline-block;
-    border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    text-decoration: none;
-    font-size:1.5rem;
-    font-weight: bold;
-    width: 10rem;
-    height: 3rem;
-    background-color:white;
-    z-index: 10; /* 다른 요소들 위에 놓이도록 설정 */
-}
-@keyframes ring { /* 퍼져나가는 효과 */
-    0% {
-        width: 3rem;
-        height: 3rem;
-        opacity: 1;
-    }
-    100% {
-        width: 10rem;
-        height: 10rem;
-        opacity: 0;
-    }
-}
-
-#confirmButton:hover::after{
-	display: block;
-	content: "";
-    width: 30px;
-    height: 30px;
-    border-radius: 100%;
-    border: 6px solid white;
-    position: absolute;
-    z-index: -1;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: ring 1s;
-}
+html { font-size: clamp(14px, 1.5vw, 24px); }
+.message-container { display: flex; flex-direction: column; align-items: center; width: calc(100% - 1.5px); border: 1.5px solid #E2E2E2; border-radius: 30px; background-color: #f2f2f2; box-sizing: border-box; margin: 0; padding: 0; font-size: 2.2rem; overflow: hidden; }
+.message-container * { width: 90%; }
+#search { display: flex; background-color: #D9D9D9; flex-direction: row; min-height: 48px; min-width: 90%; height: 48px; border-radius: 20px; box-sizing: border-box; margin-top: 20px; padding: 0; }
+.beforePage { border: none; background-color: transparent; justify-content: flex-start; width: 10%; }
+#searchInput { border: none; background-color: transparent; justify-content: center; width: 80%; font-size: 2.2rem; font-weight: bold; outline: none; background-color: transparent; }
+#searchBtn { border: none; background-color: transparent; justify-content: flex-end; width: 10%; }
+.barBtns { width: 35px; height: 35px; }
+#title { font-size: 2.2rem; font-weight: bold; text-align: left; position: relative; top: 20px; }
+#title::after { content: ""; display: block; height: 20px; }
+.table-container { display: block; width: 100%; height: 70vh; font-size: 2.2rem; overflow: auto; }
+table { table-layout: fixed; margin: 0 auto; width: 100%; position: relative; border-spacing: 0 2.5rem; }
+.col1 { width: 100px; }
+.col2 { width: auto; }
+.col3 { width: 70px; }
+.col4 { width: 10px; }
+.modal { display: none; position: fixed; width: 300px; height: 300px; background-color: transparent; z-index: 1000; }
+.modal-content p { display: flex; box-sizing: border-box; width: 100%; padding-right: 20px; justify-content: space-between; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 20px; }
+.close { cursor: pointer; width: 10px; }
+.modal-content { justify-content: center; background-color: #D9D9D9; padding: 20px; border-radius: 10px; position: absolute; font-weight: bold; text-align: center; }
+.modal-content button { background-color: transparent; color: black; border: none; cursor: pointer; font-size: 2rem; margin: 10px; text-align: left; }
+#msgTable tr:hover .col4 { visibility: visible; }
+#msgTable tr:not(hover) .col4 { visibility: hidden; }
+#chatInfo1 { list-style-type: none; display: flex; flex-direction: column; gap: 1rem; }
+#chatInfo2 { list-style-type: none; display: flex; flex-direction: column; }
+li { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.profileImg { width: 70px; height: 70px; border-radius: 50px; background-color: white; }
+.username { font-weight: bold; font-size: 1.6rem; }
+#nowMsg { font-weight: bold; font-size: 1.1rem; width: 100%; color: gray; }
+.msgTime { font-weight: bold; font-size: 0.9rem; color: gray; }
+.unread span { background-color: rgb(194, 194, 194); color: black; font-weight: bold; font-size: 1rem; text-align: center; display: inline-flex; justify-content: center; align-items: center; width: 2rem; height: 2rem; border-radius: 50%; }
+.dotImg { height: 35px; width: auto; }
+.table-container::-webkit-scrollbar { background-color: transparent; width: 10px; }
+.table-container::-webkit-scrollbar-thumb { background-color: #babac0; border-radius: 16px; }
+.table-container::-webkit-scrollbar-thumb:hover { background-color: #a0a0a5; }
+.table-container::-webkit-scrollbar-track { border-radius: 10px; background-color: transparent; }
+.table-container::-webkit-scrollbar-track:hover { background-color: transparent; }
+.table-container::-webkit-scrollbar-button { display: none; }

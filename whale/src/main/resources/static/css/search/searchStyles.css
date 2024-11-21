@@ -1,0 +1,69 @@
+::-webkit-scrollbar {display: none;}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {-webkit-text-fill-color: #000; -webkit-box-shadow: 0 0 0px 1000px #fff inset; box-shadow: 0 0 0px 1000px #fff inset; transition: background-color 5000s ease-in-out 0s;}
+
+.searchHomeBody[data-darkmode="0"] {min-height: 100vh; -ms-overflow-style: none; background-color: #f0f0f0; margin: 0;}
+.searchHomeBody[data-darkmode="0"] .header {display: flex; justify-content: center; border-bottom: 1.5px solid #ccc; padding: 10px 0; box-sizing: border-box;}
+.searchHomeBody[data-darkmode="0"] .headerSearch {display: flex; justify-content: center; align-items: center; width: 30%; height: 60%; border: 1.6px solid #ccc; border-radius: 18px; padding: 9px 0;}
+.searchHomeBody[data-darkmode="0"] .headerSearchInput {width: 80%; height: 56%; background: transparent; border: none; outline: none; font-size: 13px; color: rgb(164, 164, 164); text-align: center; cursor: grab;}
+.searchHomeBody[data-darkmode="0"] .headerSearch .searchBtn{border: 0; background-color: transparent; display: flex; align-items: center; justify-content: center; opacity: .7;}
+.searchHomeBody[data-darkmode="0"] .headerSearch form{display: flex; align-items: center; justify-content: space-around;}
+.searchHomeBody[data-darkmode="0"] .mainSearch {width: 100%;}
+.searchHomeBody[data-darkmode="0"] .mainSearchContainer {width: 97%; height: 99%; background-color: #fff; border-radius: 16px; overflow: scroll; margin: 10px;}
+.searchHomeBody[data-darkmode="0"] .mainSearchTab{display: flex; gap: 1px; background: #fff;}
+.searchHomeBody[data-darkmode="0"] .mainSearchTab p{flex: 0 0 33.3%; background-color: #b8b8b8; text-align: center; margin: 0 0 2px 0; padding: 12px 0; font-size: .85rem; color: #111; cursor: pointer;}
+.searchHomeBody[data-darkmode="0"] .searchProfile{width: 60px; height: 60px; border: 3.5px solid #E2E2E2; border-radius: 50%;}
+.searchHomeBody[data-darkmode="0"] .searchProfile img {width: 100%; height: 100%; object-fit: cover; border-radius: 50%;}
+.searchHomeBody[data-darkmode="0"] .mainSearchTab p.active {font-weight: bold; background: #a0a0a0;}
+.searchHomeBody[data-darkmode="0"] .mainSearchResult > a{text-decoration: none; color: inherit;}
+.searchHomeBody[data-darkmode="0"] .userItem{display: flex; align-items: center; padding: 15px 30px; border-bottom: 1px solid #ccc; gap: 20px;}
+.searchHomeBody[data-darkmode="0"] .userItem:hover{background: #cecece;}
+.searchHomeBody[data-darkmode="0"] .userItem img{width: 50px; height: 50px; border-radius: 50%; object-fit: cover}
+.searchHomeBody[data-darkmode="0"] .userItem p:first-child{color: #111;}
+.searchHomeBody[data-darkmode="0"] .userItem p{color: rgb(164, 164, 164);}
+.searchHomeBody[data-darkmode="0"] .postItem{align-items: center; padding: 15px 30px; border-bottom: 1px solid #1f1f1f; gap: 20px;}
+.searchHomeBody[data-darkmode="0"] .postItem:hover{background: #cecece;}
+.searchHomeBody[data-darkmode="0"] .postItemFlexBox{display: flex; justify-content: space-between; align-items: center;}
+.searchHomeBody[data-darkmode="0"] .postItemFlexBox .post-tag{margin: 5px 0;}
+.searchHomeBody[data-darkmode="0"] .postItemFlexBox span{font-weight: bold;}
+.searchHomeBody[data-darkmode="0"] .postItemFlexBox h3{margin: 0;}
+.searchHomeBody[data-darkmode="0"] .postItem > * > *{margin: 0;}
+.searchHomeBody[data-darkmode="0"] .postItem p{color: rgb(164, 164, 164); margin: 20px 0 5px;}
+.searchHomeBody[data-darkmode="0"] .feedContainer{display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #fff;}
+.searchHomeBody[data-darkmode="0"] .feedItem {box-sizing: border-box; text-align: center; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; /* 넘치는 내용 숨김 */ aspect-ratio: 1 / 1;}
+.searchHomeBody[data-darkmode="0"] .feedItem img {width: 100%; height: 100%; object-fit: cover; /* 이미지가 컨테이너를 완전히 채우도록 조정 */}
+/*-----------------------------------------------------------------------------------------------------------*/
+.searchHomeBody[data-darkmode="1"] {min-height: 100vh; -ms-overflow-style: none; background-color: #1f1f1f; margin: 0;}
+.searchHomeBody[data-darkmode="1"] .header {display: flex; justify-content: center; border-bottom: 1.5px solid #2e2e2e; padding: 10px 0; box-sizing: border-box;}
+.searchHomeBody[data-darkmode="1"] .headerSearch {display: flex; justify-content: center; align-items: center; width: 30%; height: 60%; border: 1.6px solid #3c3c3c; border-radius: 18px; padding: 9px 0;}
+.searchHomeBody[data-darkmode="1"] .headerSearchInput {width: 80%; height: 56%; background: transparent; border: none; outline: none; font-size: 13px; color: rgb(164, 164, 164); text-align: center; cursor: grab;}
+.searchHomeBody[data-darkmode="1"] .headerSearch .searchBtn{border: 0; background-color: transparent; display: flex; align-items: center; justify-content: center;}
+.searchHomeBody[data-darkmode="1"] .headerSearch form{display: flex; align-items: center; justify-content: space-around;}
+.searchHomeBody[data-darkmode="1"] .mainSearch {width: 100%;}
+.searchHomeBody[data-darkmode="1"] .mainSearchContainer {width: 97%; height: 99%; background-color: #2e2e2e; border-radius: 16px; overflow: scroll; margin: 10px;}
+.searchHomeBody[data-darkmode="1"] .mainSearchTab{display: flex; gap: 1px; background: #1f1f1f;}
+.searchHomeBody[data-darkmode="1"] .mainSearchTab p{flex: 0 0 33.3%; background-color: #2e2e2e; text-align: center; margin: 0 0 2px 0; padding: 12px 0; font-size: .85rem; color: rgb(164, 164, 164); cursor: pointer;}
+.searchHomeBody[data-darkmode="1"] .searchProfile{width: 60px; height: 60px; border: 3.5px solid #E2E2E2; border-radius: 50%;}
+.searchHomeBody[data-darkmode="1"] .searchProfile img {width: 100%; height: 100%; object-fit: cover; border-radius: 50%;}
+.searchHomeBody[data-darkmode="1"] .mainSearchTab p.active {font-weight: bold; background: #6a6a6a;}
+.searchHomeBody[data-darkmode="1"] .mainSearchResult > a{text-decoration: none; color: inherit;}
+.searchHomeBody[data-darkmode="1"] .userItem{display: flex; align-items: center; padding: 15px 30px; border-bottom: 1px solid #1f1f1f; gap: 20px;}
+.searchHomeBody[data-darkmode="1"] .userItem:hover{background: #4d4d4d;}
+.searchHomeBody[data-darkmode="1"] .userItem img{width: 50px; height: 50px; border-radius: 50%; object-fit: cover}
+.searchHomeBody[data-darkmode="1"] .userItem p:first-child{color: #fff;}
+.searchHomeBody[data-darkmode="1"] .userItem p{color: rgb(164, 164, 164);}
+.searchHomeBody[data-darkmode="1"] .postItem{align-items: center; padding: 15px 30px; border-bottom: 1px solid #1f1f1f; gap: 20px;}
+.searchHomeBody[data-darkmode="1"] .postItem:hover{background: #4d4d4d;}
+.searchHomeBody[data-darkmode="1"] .postItemFlexBox{display: flex; justify-content: space-between; align-items: center;}
+.searchHomeBody[data-darkmode="1"] .postItemFlexBox .post-tag{margin: 5px 0;}
+.searchHomeBody[data-darkmode="1"] .postItemFlexBox span{font-weight: bold; color: whitesmoke;}
+.searchHomeBody[data-darkmode="1"] .postItemFlexBox h3{margin: 0; color: whitesmoke;}
+.searchHomeBody[data-darkmode="1"] .postItem > * > *{margin: 0;}
+.searchHomeBody[data-darkmode="1"] .postItem p{color: rgb(164, 164, 164); margin: 20px 0 5px;}
+.searchHomeBody[data-darkmode="1"] .feedContainer{display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #2e2e2e;}
+.searchHomeBody[data-darkmode="1"] .feedItem {box-sizing: border-box; text-align: center; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; /* 넘치는 내용 숨김 */ aspect-ratio: 1 / 1;}
+.searchHomeBody[data-darkmode="1"] .feedItem img {width: 100%; height: 100%; object-fit: cover; /* 이미지가 컨테이너를 완전히 채우도록 조정 */}
+

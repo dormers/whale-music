@@ -10,12 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserInfoDto {
-	public UserInfoDto(String user_id, String user_email, String user_image_url, String user_password) {
-		this.user_id = user_id;
-		this.user_password = user_password;
-		this.user_email = user_email;
-		this.user_image_url = user_image_url;
-	}
 	private String user_id;
 	private String user_password;
 	private String user_nickname;
@@ -23,5 +17,7 @@ public class UserInfoDto {
 	private String user_image_url;
 	private int user_access_id;
 	private String user_spotify_id;
-
+	private String user_track_id;
+	private String track_artist;
+	private String track_name;
 }

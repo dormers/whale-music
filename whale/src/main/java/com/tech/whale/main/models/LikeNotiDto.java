@@ -19,4 +19,5 @@ public class LikeNotiDto {
 	private String target_user_id;
 	private int post_id;
 	private int community_id;
+	private int feed_id;
 }

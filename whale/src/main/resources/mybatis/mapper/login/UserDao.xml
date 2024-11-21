@@ -6,8 +6,8 @@
 <mapper namespace="com.tech.whale.login.dao.UserDao">
 
     <insert id="insertUserInfo">
-        INSERT INTO USER_INFO (USER_ID, USER_PASSWORD, USER_EMAIL, USER_NICKNAME)
-        VALUES (#{user_id}, #{user_password}, #{user_email}, #{user_nickname})
+        INSERT INTO USER_INFO (USER_ID, USER_PASSWORD, USER_EMAIL, USER_NICKNAME, USER_SPOTIFY_ID)
+        VALUES (#{user_id}, #{user_password}, #{user_email}, #{user_nickname}, #{user_spotify_id})
     </insert>
     
     <insert id="insertUserNotification">
@@ -21,11 +21,7 @@
     <insert id="insertStartPageSetting">
         INSERT INTO STARTPAGE_SETTING (USER_ID) VALUES (#{user_id})
     </insert>
-    
-    <insert id="insertBlock">
-        INSERT INTO BLOCK (USER_ID) VALUES (#{user_id})
-    </insert>
-    
+
     <insert id="insertUserSetting">
         INSERT INTO USER_SETTING (USER_ID) VALUES (#{user_id})
     </insert>
@@ -56,14 +52,25 @@
         INSERT INTO USER_INFO (USER_ID, USER_PASSWORD, USER_EMAIL) VALUES (#{user_id}, #{password}, #{email})
     </insert>
 
-    <!-- 이메일 존재 여부 확인 -->
-    <select id="existsByEmail" resultType="Integer">
-        SELECT COUNT(*) FROM USER_INFO WHERE USER_EMAIL = #{email}
+    <!-- USER_ID 중복 확인 -->
+    <select id="existsByUsername" resultType="Integer">
+        SELECT COUNT(*) FROM USER_INFO WHERE USER_ID = #{user_id}
     </select>
+
+    <!-- USER_NICKNAME 중복 확인 -->
+    <select id="existsByNickname" resultType="Integer">
+        SELECT COUNT(*) FROM USER_INFO WHERE USER_NICKNAME = #{user_nickname}
+    </select>
+
+    <!-- USER_EMAIL 중복 확인 -->
+    <select id="existsByEmail" resultType="Integer">
+        SELECT COUNT(*) FROM USER_INFO WHERE USER_EMAIL = #{user_email}
+    </select>
+
 
     <!-- 비밀번호 재설정 토큰 저장 -->
     <insert id="saveResetToken">
-        INSERT INTO PASSWORD_RESETS (USER_EMAIL, TOKEN) VALUES (#{email}, #{token})
+        INSERT INTO PASSWORD_RESETS (USER_ID, TOKEN) VALUES (#{user_id}, #{token})
     </insert>
 
     <!-- 유효한 토큰 확인 -->
@@ -73,7 +80,184 @@
 
     <!-- 토큰을 사용하여 비밀번호 업데이트 -->
     <update id="updatePasswordByToken">
-        UPDATE USER_INFO SET USER_PASSWORD = #{hashedPassword} WHERE USER_EMAIL = (SELECT USER_EMAIL FROM PASSWORD_RESETS WHERE TOKEN = #{token})
+        UPDATE USER_INFO
+        SET USER_PASSWORD = #{hashedPassword}
+        WHERE USER_ID = (SELECT USER_ID FROM PASSWORD_RESETS WHERE TOKEN = #{token})
     </update>
+
+    <!-- 사용자 아이디 가져오기 -->
+    <select id="getUserIdByEmail" resultType="String">
+        SELECT USER_ID FROM USER_INFO WHERE USER_EMAIL = #{email}
+    </select>
+
+    <select id="getUsersByEmail" parameterType="String" resultType="com.tech.whale.login.dto.UserDto">
+        SELECT user_id, user_email, user_nickname, user_spotify_id
+        FROM USER_INFO
+        WHERE user_email = #{email}
+    </select>
+
+    <delete id="deleteUserById" parameterType="String">
+        DELETE FROM user_info WHERE user_id = #{user_id}
+    </delete>
     
+    <select id="getUserStatus" resultType="Integer">
+        SELECT USER_STATUS
+        FROM USER_INFO
+        WHERE USER_ID = #{userId}
+    </select>
+    
+    <select id="getUserEndDate" parameterType="String" resultType="Date">
+        SELECT MAX(USER_END_ACTION)
+        FROM REPORT_RESULT
+        WHERE TARGET_USER_ID = #{userId}
+    </select>
+
+    <select id="selectFollowingUsers" resultType="String">
+        SELECT user_id
+        FROM follow
+        WHERE follow_user_id LIKE '%,' || #{user_id} || ',%'
+           OR follow_user_id LIKE #{user_id} || ',%'
+           OR follow_user_id LIKE '%,' || #{user_id}
+           OR follow_user_id = #{user_id}
+    </select>
+
+    <update id="doUnfollowing">
+        UPDATE follow
+        SET follow_user_id = TRIM(',' FROM REPLACE(',' || follow_user_id || ',', ',' || #{unfollow_user_id} || ',', ','))
+        WHERE user_id = #{user_id}
+          AND (follow_user_id LIKE '%,' || #{unfollow_user_id} || ',%'
+            OR follow_user_id LIKE #{unfollow_user_id} || ',%'
+            OR follow_user_id LIKE '%,' || #{unfollow_user_id}
+            OR follow_user_id = #{unfollow_user_id})
+    </update>
+
+    <delete id="deleteFeedsByUserId" parameterType="String">
+        DELETE FROM feed WHERE user_id = #{user_id}
+    </delete>
+
+    <!-- user_info 테이블의 user_id 업데이트 -->
+    <update id="changeUserInfoByUserId">
+        UPDATE user_info
+        SET user_id = #{new_user_id}
+        WHERE user_id = #{user_id}
+    </update>
+
+    <!-- USER_NOTIFICATION_ONOFF 테이블 관련 메서드 -->
+    <delete id="deleteUserNotiOnoffByUserId">
+        DELETE FROM USER_NOTIFICATION_ONOFF
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertUserNotiOnoffWithNewUserId">
+        INSERT INTO USER_NOTIFICATION_ONOFF (user_id)
+        VALUES (#{user_id})
+    </insert>
+
+    <!-- PAGE_ACCESS_SETTING 테이블 관련 메서드 -->
+    <delete id="deleteUserPageAccessSettingByUserId">
+        DELETE FROM PAGE_ACCESS_SETTING
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertUserPageAccessSettingWithNewUserId">
+        INSERT INTO PAGE_ACCESS_SETTING (user_id)
+        VALUES (#{user_id})
+    </insert>
+
+    <!-- STARTPAGE_SETTING 테이블 관련 메서드 -->
+    <delete id="deleteUserStartpageSettingByUserId">
+        DELETE FROM STARTPAGE_SETTING
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertUserStartpageSettingWithNewUserId">
+        INSERT INTO STARTPAGE_SETTING (user_id)
+        VALUES (#{user_id})
+    </insert>
+
+    <!-- USER_SETTING 테이블 관련 메서드 -->
+    <delete id="deleteUserSettingByUserId">
+        DELETE FROM USER_SETTING
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertUserSettingByUserId">
+        INSERT INTO USER_SETTING (user_id)
+        VALUES (#{user_id})
+    </insert>
+
+    <!-- PROFILE 테이블 관련 메서드 -->
+    <delete id="deleteUserProfileByUserId">
+        DELETE FROM PROFILE
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertUserProfileWithNewUserId">
+        INSERT INTO PROFILE (user_id)
+        VALUES (#{user_id})
+    </insert>
+
+    <!-- FOLLOW 테이블 관련 메서드 -->
+    <delete id="deleteUserFollowByUserId">
+        DELETE FROM FOLLOW
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertUserFollowWithNewUserId">
+        INSERT INTO FOLLOW (user_id)
+        VALUES (#{user_id})
+    </insert>
+
+    <!-- MASSAGE 테이블 관련 메서드 -->
+    <delete id="deleteUserIdInMessageByUserId">
+        DELETE FROM MESSAGE
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertUserIdInMessageWithNewUserId">
+        INSERT INTO MESSAGE (MESSAGE_ID, user_id)
+        VALUES (MESSAGE_SEQ.nextval, #{user_id})
+    </insert>
+
+    <update id="changeUserIdInMessage">
+        UPDATE MESSAGE
+        SET user_id = #{newUserId}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- MASSAGE_ROOM 테이블 관련 메서드 -->
+    <delete id="deleteUserIdInMessageRoomUserByUserId">
+        DELETE FROM MESSAGE_ROOM_USER
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertUserIdInMessageRoomUserWithNewUserId">
+        INSERT INTO MESSAGE_ROOM_USER (user_id)
+        VALUES (#{user_id})
+    </insert>
+
+    <update id="changeUserIdInMessageRoomUser">
+        UPDATE MESSAGE_ROOM_USER
+        SET user_id = #{newUserId}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 팔로우 정보를 가져오는 쿼리 -->
+    <select id="getFollowUserIds" parameterType="String" resultType="String">
+        SELECT FOLLOW_USER_ID FROM follow WHERE USER_ID = #{followerId}
+    </select>
+
+    <!-- 새로 가입한 유저가 WHALE 계정을 팔로우하는 쿼리 -->
+    <update id="insertFollowUser">
+        UPDATE follow
+        SET FOLLOW_USER_ID = #{followeeId}
+        WHERE USER_ID = #{followerId}
+    </update>
+
+    <!-- WHALE 계정이 새 유저를 팔로우할 때 기존 팔로우 목록에 새 유저 ID를 추가 -->
+    <update id="updateFollowUserIds">
+        UPDATE follow
+        SET FOLLOW_USER_ID = #{updatedFollowees}
+        WHERE USER_ID = #{followerId}
+    </update>
 </mapper>

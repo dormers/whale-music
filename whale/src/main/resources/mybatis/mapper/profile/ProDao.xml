@@ -5,7 +5,12 @@
 
 <mapper namespace="com.tech.whale.profile.dao.ProDao">
 	<select id="getUserProfile" resultType="com.tech.whale.profile.dto.ProfileDto">
-	SELECT USER_ID, USER_NICKNAME, USER_IMAGE_URL FROM USER_INFO WHERE USER_ID = #{param1} 
+	SELECT U.USER_ID, U.USER_NICKNAME, U.USER_IMAGE_URL, S.ACCOUNT_PRIVACY,
+	T.TRACK_ID, T.TRACK_ARTIST, T.TRACK_NAME, T.TRACK_COVER
+	FROM USER_INFO U
+	JOIN USER_SETTING S ON U.USER_ID = S.USER_ID
+	LEFT JOIN TRACK T ON U.USER_TRACK_ID = T.TRACK_ID
+	WHERE U.USER_ID = #{param1} 
 	</select>
     
     <select id="followerCount" resultType="int">
@@ -16,22 +21,38 @@
     
     <select id="followingCount" resultType="int">
     SELECT COUNT(*) AS FOLLOWING_COUNT
-	FROM FOLLOW 
-	WHERE INSTR(FOLLOW_USER_ID, #{param1}) > 0
+    FROM FOLLOW
+    WHERE (',' || FOLLOW_USER_ID || ',') LIKE CONCAT('%,', CONCAT(#{user_id}, ',%'))
+    </select>
+    <select id="getNotiId" resultType="com.tech.whale.main.models.FollowNotiDto">
+    SELECT FOLLOW_NOTI_USER_ID AS TARGET_USER_ID
+    FROM FOLLOW_NOTI
+    WHERE USER_ID = #{user_id}
+	AND FOLLOW_NOTI_USER_ID = #{now_id}
+	AND FOLLOW_NOTI = 1
     </select>
     
-    <select id="getFollowerList" resultType="com.tech.whale.profile.dto.ProfileDto">
-    SELECT U.USER_IMAGE_URL, U.USER_NICKNAME, U.USER_ID FROM USER_INFO U
-    WHERE U.USER_ID IN (SELECT REGEXP_SUBSTR(F.FOLLOW_USER_ID, '[^,]+', 1, LEVEL) AS FOLLOW_USER_ID
-    FROM FOLLOW F
-    WHERE F.USER_ID = #{param1}
-    CONNECT BY REGEXP_SUBSTR(F.FOLLOW_USER_ID, '[^,]+', 1, LEVEL) IS NOT NULL)
+    <select id="feedCount" resultType="int">
+    SELECT COUNT(*) AS FEED_COUNT
+    FROM FEED
+    WHERE USER_ID = #{param1}
+    AND FEED_OPEN = 0
     </select>
+    
+    
+    
+	<select id="getFollowerList" resultType="com.tech.whale.profile.dto.ProfileDto">
+	    SELECT U.USER_IMAGE_URL, U.USER_NICKNAME, U.USER_ID
+	    FROM USER_INFO U
+	    JOIN FOLLOW F ON (',' || F.FOLLOW_USER_ID || ',') LIKE CONCAT('%,', CONCAT(U.USER_ID, ',%'))
+	    WHERE F.USER_ID = #{param1}
+	</select>
     
     <select id="getFollowingList" resultType="com.tech.whale.profile.dto.ProfileDto">
-    SELECT U.USER_IMAGE_URL, U.USER_NICKNAME, U.USER_ID FROM USER_INFO U
-    JOIN FOLLOW F ON U.USER_ID = F.USER_ID
-    WHERE INSTR(F.FOLLOW_USER_ID, #{param1}) > 0
+	SELECT U.USER_IMAGE_URL, U.USER_NICKNAME, U.USER_ID
+	FROM USER_INFO U
+	JOIN FOLLOW F ON U.USER_ID = F.USER_ID
+	WHERE (',' || FOLLOW_USER_ID || ',') LIKE CONCAT('%,', CONCAT(#{user_id}, ',%'))
     </select>
     
 	<update id="doUnfollowing">

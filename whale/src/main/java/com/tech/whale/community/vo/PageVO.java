@@ -1,7 +1,7 @@
 package com.tech.whale.community.vo;
 
 public class PageVO {
-	private Integer displayRowCount = 5;  // 출력할 데이터 갯수
+	private Integer displayRowCount = 10;  // 출력할 데이터 갯수
 	private Integer rowStart;  			// 시작행 번호
 	private Integer rowEnd;  			// 종료행 번호
 	private Integer totPage; 			 // 전체페이지 수

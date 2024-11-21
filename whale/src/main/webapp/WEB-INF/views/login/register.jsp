@@ -20,7 +20,7 @@
 <body>
 	<div class="header">
 	    <div class="headerItems flexCenter">
-	        <img src="static/images/login/whaleLogo.png" alt="Music Whale Logo" height="80px">
+	        <img src="static/images/login/whaleLogo.png" alt="Music Whale Logo" id="whale-logo" height="80px" onclick="location.href=`<%= request.getContextPath() %>/`">
 	    </div>
 	</div>
 	<div class="main flexCenter">
@@ -30,6 +30,7 @@
 	            <form id="register-form">
 	                <input type="text" id="username" placeholder="아이디" required><br>
 	                <input type="password" id="password" placeholder="비밀번호" required><br>
+	                <input type="password" id="passwordCheck" placeholder="비밀번호 확인" required><br>
 	                <input type="text" id="user_nickname" placeholder="닉네임" required><br>
 	                <!-- 세션에 저장된 스포티파이 이메일을 가져와서 이메일 칸에 자동 입력 -->
 	                <input type="email" id="email" placeholder="이메일" required readonly value="<%= session.getAttribute("spotifyEmail") != null ? session.getAttribute("spotifyEmail") : "" %>"><br>
@@ -37,6 +38,7 @@
 	            </form>
 	            <p class="loginJoin-footer">이미 계정이 있으신가요? <a href="<%= request.getContextPath() %>/">로그인</a></p>
 	            <div id="message"></div>
+	            <div id="messageSub"></div>
 	        </div>
 	    </div>
 	</div>

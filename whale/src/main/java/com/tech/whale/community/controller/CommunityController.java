@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.tech.whale.community.dao.ComDao;
 import com.tech.whale.community.dto.CommentDto;
 import com.tech.whale.community.dto.PostDto;
+import com.tech.whale.community.service.BookmarkService;
 import com.tech.whale.community.service.ComDetailService;
 import com.tech.whale.community.service.ComHomeService;
 import com.tech.whale.community.service.ComLikeCommentService;
@@ -45,14 +46,31 @@ public class CommunityController {
 	private ComRegService comRegService;
 	
 	@Autowired
+	private ComHomeService comHomeService;
+	
+	@Autowired
 	private PostUpdateService postUpdateService;
+	
+	@Autowired
+	private BookmarkService bookmarkService;
+	
+	@PostMapping("/toggleBookmark")
+	@ResponseBody
+	public String toggleBookmark(@RequestParam("communityId") int communityId, HttpSession session) {
+	    String userId = (String) session.getAttribute("user_id"); // 세션에서 사용자 ID를 가져옴
+	    if (userId == null) {
+	        return "error"; // 세션이 없으면 에러
+	    }
+
+	    boolean isBookmarked = bookmarkService.toggleBookmark(communityId, userId);
+	    return isBookmarked ? "followed" : "unfollowed"; // 즐겨찾기 상태에 따라 응답
+	}
 	
 	@RequestMapping("/communityHome")
 	public String communityHome(HttpServletRequest request, Model model) {
 		System.out.println("communityHome");
-		model.addAttribute(request);
-		comServiceInter = new ComHomeService(comDao);
-		comServiceInter.execute(model);
+		model.addAttribute("request", request);
+		comHomeService.execute(model);
 		
 		return "community/communityHome";
 	}
@@ -81,72 +99,58 @@ public class CommunityController {
 	}
 	
 	@RequestMapping("/communityDetail")
-	public String communityDetail(@RequestParam("c") int communityId, HttpSession session, @RequestParam("p") String postId, HttpServletRequest request, Model model) {
-		System.out.println("communityDetail");
-		System.out.println("postId : " + postId);
-		String communityName = comDao.getCommunityName(communityId);
-		
-		PostDto postDetail = comDao.getPost(postId);
-		
-		List<CommentDto> commentsList = comLikeCommentService.getCommentsForPost(postId);
-		postDetail.setComments(commentsList);
-		
-		System.out.println(session.getAttribute("user_id"));
-		String now_id = (String) session.getAttribute("user_id");
-		
-		System.out.println("Comments List: " + commentsList);
-		
-		
-		
-		model.addAttribute("now_id", now_id);
-		
-		model.addAttribute("communityName", communityName);
-		model.addAttribute("postId", postId);
-		model.addAttribute("postDetail", postDetail);
-		model.addAttribute("request", request);
-		comServiceInter = new ComDetailService(comDao);
-		System.out.println("Before execute - postDetail: " + postDetail);
-		comServiceInter.execute(model);
-		System.out.println("After execute - postDetail: " + model.getAttribute("postDetail"));
-		return "community/communityDetail";
+	public String communityDetail(
+	    @RequestParam("c") int communityId,
+	    HttpSession session,
+	    @RequestParam("p") String postId,
+	    HttpServletRequest request,
+	    Model model) {
+
+	    String communityName = comDao.getCommunityName(communityId);
+	    String now_id = (String) session.getAttribute("user_id");
+
+	    // 모델에 필요한 데이터 추가
+	    model.addAttribute("now_id", now_id);
+	    model.addAttribute("communityName", communityName);
+	    model.addAttribute("postId", postId);
+	    model.addAttribute("request", request);
+	    model.addAttribute("communityId", communityId);
+
+	    // 서비스 클래스를 통해 비즈니스 로직 처리
+	    comServiceInter = new ComDetailService(comDao, comLikeCommentService);
+	    comServiceInter.execute(model);
+
+	    return "community/communityDetail";
 	}
 	
-    @PostMapping("/communityDetail/like")
-    public String likePost(@RequestParam("c") int communityId, @RequestParam("postId") String postId, @RequestParam("userId") String userId, Model model) {
-        int newLikeCount = comLikeCommentService.toggleLike(postId, userId);
+	@PostMapping("/communityDetail/like")
+	@ResponseBody
+	public Map<String, Object> likePost(@RequestParam("postId") String postId, @RequestParam("userId") String userId) {
+	    int newLikeCount = comLikeCommentService.toggleLike(postId, userId);
 
-        PostDto postDetail = comDao.getPost(postId); 
-        postDetail.setLikeCount(newLikeCount);
-        
-        // 모델에 필요한 값 추가
-        model.addAttribute("postDetail", postDetail);
-        model.addAttribute("likeCount", newLikeCount);
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("success", true);
+	    result.put("newLikeCount", newLikeCount);
 
-        return "redirect:/communityDetail?c=" + communityId + "&p=" + postId;
-        
-    }
+	    return result;
+	}
     
     @PostMapping("/communityDetail/comments")
-    public String commentsPost(@RequestParam("c") int communityId, @RequestParam("comments") String comments, @RequestParam("postId") String postId, @RequestParam("userId") String userId, Model model) {
+    public String commentsPost(@RequestParam("c") int communityId, 
+    		@RequestParam("comments") String comments, 
+    		@RequestParam("postId") String postId, 
+    		@RequestParam("userId") String userId,
+    	    @RequestParam(value = "parentCommentId", required = false) String parentCommentId,
+    	    Model model) {
         
 
-    	comLikeCommentService.insertComment(postId, userId, comments);
-    	
-    	List<CommentDto> commentsList = comLikeCommentService.getCommentsForPost(postId);
-    	
-    	
-        PostDto postDetail = comDao.getPost(postId); 
-        postDetail.setComments(commentsList);
-        
-        
-        // 모델에 필요한 값 추가
-        model.addAttribute("postDetail", postDetail);
+    	comLikeCommentService.insertComment(postId, userId, comments, parentCommentId);
 
         return "redirect:/communityDetail?c=" + communityId + "&p=" + postId;
         
     }
     
-    @PostMapping("/communityDetail/deleteComment")
+    @RequestMapping("/communityDetail/deleteComment")
     public String deleteComments(@RequestParam("postCommentsId") String postCommentsId,
                                 @RequestParam("postId") String postId,
                                 @RequestParam("communityId") int communityId) {
@@ -183,7 +187,7 @@ public class CommunityController {
             @RequestParam("post_text") String post_text,
             @RequestParam("user_id") String user_id,
             @RequestParam("post_tag_id") int post_tag_id,  // 태그 ID
-            @RequestParam("file") List<MultipartFile> images, // 다중 이미지 업로드
+            @RequestParam(value = "selectedTrackId", required = false) String track_id,
             HttpSession session, Model model) {
 		
 		System.out.println("communityReg");
@@ -194,9 +198,12 @@ public class CommunityController {
 		postDto.setPost_title(post_title);
 		postDto.setPost_text(post_text);
 		postDto.setPost_tag_id(post_tag_id);
+		if (track_id != null) {
+			postDto.setTrack_id(track_id);			
+		}
         try {
             // 게시글 및 이미지 저장
-            comRegService.registerPost(postDto, images);
+            comRegService.registerPost(postDto);
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("errorMessage", "이미지 업로드 중 오류가 발생했습니다.");
@@ -261,7 +268,7 @@ public class CommunityController {
 	                                @RequestParam("post_tag_id") int postTagId,
 	                                @RequestParam("post_title") String postTitle,
 	                                @RequestParam("post_text") String postText,
-	                                @RequestParam(value = "file", required = false) List<MultipartFile> newImages,
+	                                @RequestParam(value = "selectedTrackId", required = false) String selectedTrackId,
 	                                RedirectAttributes redirectAttributes) {
 	    
 	    PostDto postDto = new PostDto();
@@ -271,9 +278,16 @@ public class CommunityController {
 	    postDto.setPost_tag_id(postTagId);
 	    
 	    try {
-	        // 게시물 업데이트 및 새로운 이미지 저장
-	        postUpdateService.updatePostAndInsertImages(postDto, newImages);
-	    } catch (IOException e) {
+	        // 게시물 업데이트
+	        postUpdateService.updatePost(postDto);
+	        
+	        // 음악 정보 업데이트
+	        if (selectedTrackId != null && !selectedTrackId.isEmpty()) {
+	            postUpdateService.updatePostMusic(postId, selectedTrackId);
+	        } else {
+	            postUpdateService.removePostMusic(postId);
+	        }
+	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return "errorPage";
 	    }
@@ -282,26 +296,19 @@ public class CommunityController {
 	    return "redirect:/communityDetail?c=" + communityId + "&p=" + postId;
 	}
 	
-	@RequestMapping(value = "/deleteImage", method = RequestMethod.POST)
+	
+	
+	
+	@PostMapping("/communityDetail/commentLike")
 	@ResponseBody
-	public Map<String, Object> deleteImage(@RequestParam("imageId") int imageId) {
+	public Map<String, Object> likeComment(@RequestParam("commentId") String commentId, @RequestParam("userId") String userId) {
+	    int newLikeCount = comLikeCommentService.toggleCommentLike(commentId, userId);
+
 	    Map<String, Object> result = new HashMap<>();
-	    try {
-	        // 데이터베이스에서 이미지 삭제 처리
-	        int deleteResult = comDao.deletePostImage(imageId);
-	        
-	        if (deleteResult > 0) {
-	            // 삭제 성공
-	            result.put("success", true);
-	        } else {
-	            // 삭제 실패
-	            result.put("success", false);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        result.put("success", false);
-	    }
-	    
-	    return result; // JSON으로 결과 반환
+	    result.put("success", true);
+	    result.put("newLikeCount", newLikeCount);
+
+	    return result;
 	}
+	
 }

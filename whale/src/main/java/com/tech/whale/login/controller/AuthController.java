@@ -45,7 +45,7 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> initiateFind(@RequestBody HashMap<String, Object> map, HttpSession session) {
     	String email = map.get("email").toString();
         Map<String, Object> response = new HashMap<>();
-        if (!userService.isEmailRegistered(email)) {
+        if (!userService.isEmailTaken(email)) {
             response.put("success", false);
             response.put("message", "등록된 이메일이 아닙니다.");
             return ResponseEntity.ok(response);
@@ -59,9 +59,15 @@ public class AuthController {
 
     // 비밀번호 재설정 API
     @PostMapping("/find/reset-password")
-    public ResponseEntity<Map<String, Object>> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+    public Map<String, Object> resetPassword(@RequestBody Map<String, String> requestData) {
         Map<String, Object> response = new HashMap<>();
+
+        // requestData에서 token과 newPassword 추출
+        String token = requestData.get("token");
+        String newPassword = requestData.get("newPassword");
+
         boolean isTokenValid = userService.verifyResetToken(token);
+
         if (isTokenValid) {
             userService.updatePassword(token, newPassword);
             response.put("success", true);
@@ -70,6 +76,7 @@ public class AuthController {
             response.put("success", false);
             response.put("message", "유효하지 않은 토큰입니다.");
         }
-        return ResponseEntity.ok(response);
+
+        return response;
     }
 }

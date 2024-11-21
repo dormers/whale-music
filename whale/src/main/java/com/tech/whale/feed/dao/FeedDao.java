@@ -30,13 +30,23 @@ public interface FeedDao {
 	void insertLike(String feedId, String now_id);
 
 	int getLikeCount(String feedId);
-
-
+	
+	
 
 	void insertComments(String feedId, String now_id, String comments);
 
 	void deleteComments(String postCommentsId);
 
 	List<FeedCommentDto> getComments(String feedId);
+
+	void deleteFeed(String feed_id);
+
+	void hideFeed(String feed_id);
+
+	void insertFeedMusic(FeedDto feedDto);
+
+	int getNextFeedMusicId();
+
+	void openFeed(String feed_id);
 
 }

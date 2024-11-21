@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
 	
-    <title>계정관리</title>
+    <title>${pname }</title>
     <link rel="stylesheet" href="/whale/static/css/admin/menubar/adminSideBar.css">
     <link rel="stylesheet" href="/whale/static/css/admin/menubar/adminSubBar.css">
     <link rel="stylesheet" href="/whale/static/css/admin/menubar/adminHeader.css">

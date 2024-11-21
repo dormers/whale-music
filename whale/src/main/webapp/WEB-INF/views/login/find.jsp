@@ -15,7 +15,7 @@
 <body>
 	<div class="header">
 	    <div class="headerItems flexCenter">
-	        <img src="static/images/login/whaleLogo.png" alt="Music Whale Logo" height="80px">
+	        <img src="static/images/login/whaleLogo.png" alt="Music Whale Logo" id="whale-logo" height="80px" onclick="location.href=`<%= request.getContextPath() %>/`">
 	    </div>
 	</div>
 	<div class="main flexCenter">

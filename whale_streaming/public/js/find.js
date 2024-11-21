@@ -1,4 +1,12 @@
 // public/js/find.js
+// 리사이즈
+$(document).ready(() => {resize();});
+$(window).resize(() => {resize();});
+function resize() {
+  var windowHeight = $(window).height();
+  var headerHeight = $(".header").height();
+  $('.main').css({'height': (windowHeight-headerHeight-1)+'px'});
+};
 
 $(document).ready(function () {
   $("#find-form").on("submit", function (e) {

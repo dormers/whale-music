@@ -14,4 +14,6 @@ public class CommunityDto {
 	private String community_name;
 	private String community_follow;
 	private String community_name_en;
+	public boolean bookmarked;
+
 }

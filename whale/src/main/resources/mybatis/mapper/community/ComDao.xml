@@ -5,8 +5,15 @@
 
 <mapper namespace="com.tech.whale.community.dao.ComDao">
 	
-    <select id="getComAll" resultType="com.tech.whale.community.dto.CommunityDto">
-        SELECT * FROM COMMUNITY
+
+    <select id="getComAll" parameterType="string" resultType="com.tech.whale.community.dto.CommunityDto">
+	    SELECT * FROM COMMUNITY
+	    ORDER BY 
+	        CASE 
+	            WHEN ',' || COMMUNITY_FOLLOW || ',' LIKE '%,' || #{userId} || ',%' THEN 0
+	            ELSE 1
+	        END,
+	        COMMUNITY_ID ASC
     </select>
     
     <select id="getCommunityName" resultType="java.lang.String">
@@ -14,7 +21,7 @@
     </select>
     
     <select id="chooseTag" resultType="com.tech.whale.community.dto.PostDto">
-        SELECT POST_TAG_ID, POST_TAG_TEXT FROM POST_TAG
+        SELECT POST_TAG_ID, POST_TAG_TEXT FROM POST_TAG WHERE POST_TAG_ID != 5
     </select>
     
 	<sql id="includeCount">
@@ -46,16 +53,42 @@
 	</sql>
 	
 	<select id="getPostAll" resultType="com.tech.whale.community.dto.PostDto">
-	    SELECT p.POST_ID, p.COMMUNITY_ID, p.USER_ID, p.POST_TITLE, p.POST_TEXT, 
-	           TO_CHAR(p.POST_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS POST_DATE, 
-	           p.POST_URL, p.POST_CNT, p.POST_NUM, p.POST_TAG_ID, p.POST_TAG_TEXT,
-	           p.USER_NICKNAME, p.USER_IMAGE_URL  -- 하위 쿼리에서 미리 포함된 유저 정보
+	    SELECT 
+	        p.POST_ID, 
+	        p.COMMUNITY_ID, 
+	        p.USER_ID, 
+	        p.POST_TITLE, 
+	        p.POST_TEXT, 
+	        TO_CHAR(p.POST_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS POST_DATE, 
+	        p.POST_URL, 
+	        p.POST_CNT, 
+	        p.POST_NUM, 
+	        p.POST_TAG_ID, 
+	        p.POST_TAG_TEXT,
+	        p.USER_NICKNAME, 
+	        p.USER_IMAGE_URL, 
+	        NVL(like_count.likeCount, 0) AS likeCount, -- 좋아요 수 추가
+	        NVL(comments_count.commentsCount, 0) AS commentsCount -- 댓글 수 추가
 	    FROM (
-	        SELECT p.POST_ID, p.COMMUNITY_ID, p.USER_ID, p.POST_TITLE, p.POST_TEXT, 
-	               p.POST_DATE,  -- 원래의 날짜 타입 사용
-	               p.POST_URL, p.POST_CNT, p.POST_NUM, p.POST_TAG_ID, t.POST_TAG_TEXT,
-	               u.USER_NICKNAME, u.USER_IMAGE_URL,  -- 유저 정보 추가
-	               ROW_NUMBER() OVER(ORDER BY p.POST_ID DESC) AS POST_SEQ
+	        SELECT 
+	            p.POST_ID, 
+	            p.COMMUNITY_ID, 
+	            p.USER_ID, 
+	            p.POST_TITLE, 
+	            p.POST_TEXT, 
+	            p.POST_DATE,  -- 원래의 날짜 타입 사용
+	            p.POST_URL, 
+	            p.POST_CNT, 
+	            p.POST_NUM, 
+	            p.POST_TAG_ID, 
+	            t.POST_TAG_TEXT,
+	            u.USER_NICKNAME, 
+	            u.USER_IMAGE_URL,  -- 유저 정보 추가
+	            ROW_NUMBER() OVER(
+	                ORDER BY 
+	                    CASE WHEN p.POST_TAG_ID = 5 THEN 0 ELSE 1 END, -- 공지를 최상단으로 정렬
+	                    p.POST_NUM DESC
+	            ) AS POST_SEQ
 	        FROM POST p
 	        JOIN POST_TAG t ON p.POST_TAG_ID = t.POST_TAG_ID
 	        JOIN USER_INFO u ON p.USER_ID = u.USER_ID  -- 유저 정보와 조인
@@ -65,7 +98,18 @@
 	            AND p.POST_TAG_ID = #{param6}
 	        </if>
 	    ) p
-	    WHERE POST_SEQ BETWEEN #{param1} AND #{param2}
+	    LEFT JOIN (
+	        SELECT POST_ID, COUNT(*) AS likeCount
+	        FROM POST_LIKE
+	        GROUP BY POST_ID
+	    ) like_count ON p.POST_ID = like_count.POST_ID -- 좋아요 수 조인
+	    LEFT JOIN (
+	        SELECT POST_ID, COUNT(*) AS commentsCount
+	        FROM POST_COMMENTS
+	        GROUP BY POST_ID
+	    ) comments_count ON p.POST_ID = comments_count.POST_ID -- 댓글 수 조인
+	    WHERE p.POST_SEQ BETWEEN #{param1} AND #{param2}
+	    ORDER BY p.POST_SEQ -- 외부 쿼리에서 정렬 추가
 	</select>
     
     <select id="selectBoardCount" resultType="Integer">
@@ -77,6 +121,17 @@
         </if>
     </select>
     
+    <resultMap id="CommentResultMap" type="com.tech.whale.community.dto.CommentDto">
+        <id property="post_comments_id" column="POST_COMMENTS_ID"/>
+        <result property="user_id" column="USER_ID"/>
+        <result property="post_comments_text" column="POST_COMMENTS_TEXT"/>
+        <result property="post_comments_date" column="POST_COMMENTS_DATE"/>
+        <result property="parent_comments_id" column="PARENT_COMMENTS_ID"/>
+        <result property="user_image_url" column="USER_IMAGE_URL"/>
+        <result property="likeCount" column="LIKE_COUNT"/>
+        <result property="replyCount" column="REPLY_COUNT"/>
+    </resultMap>
+    
     <resultMap id="PostResultMap" type="com.tech.whale.community.dto.PostDto">
 	    <id property="post_id" column="POST_ID"/>
 	    <result property="user_id" column="USER_ID"/>
@@ -86,30 +141,33 @@
 	    <result property="post_title" column="POST_TITLE"/>
 	    <result property="post_tag_text" column="POST_TAG_TEXT"/>
 	    
-	    <!-- 이미지 정보를 위한 collection 설정 -->
-	    <collection property="images" ofType="com.tech.whale.community.dto.PostImgDto">
-	        <id property="post_img_id" column="POST_IMG_ID"/>
-	        <result property="post_img_url" column="POST_IMG_URL"/>
-	        <result property="post_img_name" column="POST_IMG_NAME"/>
-	        <result property="post_img_type" column="POST_IMG_TYPE"/>
-	    </collection>
+		<result property="track_id" column="TRACK_ID"/>
+	    <result property="track_cover" column="TRACK_COVER"/>
+	    <result property="track_name" column="TRACK_NAME"/>
+	    <result property="track_artist" column="TRACK_ARTIST"/>
+	    
 	</resultMap>
     
 	<select id="getPost" resultMap="PostResultMap">
-	    SELECT P.POST_ID, 
-	           P.USER_ID, 
-	           P.POST_TEXT, 
-	           TO_CHAR(P.POST_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS POST_DATE, 
-	           P.POST_CNT, 
-	           P.POST_TITLE, 
-	           T.POST_TAG_TEXT,
-	           I.POST_IMG_ID, -- 이미지 ID 추가
-	           I.POST_IMG_URL, -- 이미지 경로
-	           I.POST_IMG_NAME, -- 이미지 이름
-	           I.POST_IMG_TYPE -- 이미지 타입
+	    SELECT 
+	        P.POST_ID, 
+	        P.USER_ID, 
+	        P.POST_TEXT, 
+	        TO_CHAR(P.POST_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS POST_DATE, 
+	        P.POST_CNT, 
+	        P.POST_TITLE, 
+	        U.USER_IMAGE_URL,
+	        T.TRACK_ID,
+	        T.TRACK_COVER,
+	        T.TRACK_NAME,
+	        T.TRACK_ARTIST,
+	        (SELECT COUNT(*) FROM POST_LIKE PL WHERE PL.POST_ID = P.POST_ID) AS LIKE_COUNT,
+	        (SELECT COUNT(*) FROM POST_COMMENTS PC WHERE PC.POST_ID = P.POST_ID) AS COMMENTS_COUNT
 	    FROM POST P 
 	    JOIN POST_TAG T ON P.POST_TAG_ID = T.POST_TAG_ID
-	    LEFT JOIN POST_IMG I ON P.POST_ID = I.POST_ID -- 이미지 경로를 위한 LEFT JOIN
+	    LEFT JOIN POST_MUSIC M ON P.POST_ID = M.POST_ID
+	    LEFT JOIN TRACK T ON M.TRACK_ID = T.TRACK_ID
+	    LEFT JOIN USER_INFO U ON P.USER_ID = U.USER_ID
 	    WHERE P.POST_ID = #{param1}
 	</select>
 	
@@ -144,28 +202,88 @@
         WHERE post_id = #{postId}
     </select>
     
-    <insert id="insertComments">
-    	INSERT INTO post_comments (post_comments_id, post_id, user_id, post_comments_text, post_comments_date)
-    	VALUES (POST_COMMENTS_SEQ.NEXTVAL, #{postId}, #{userId}, #{comments}, SYSDATE)
-    </insert>
+	<insert id="insertComments">
+	    INSERT INTO POST_COMMENTS (POST_COMMENTS_ID, POST_ID, USER_ID, POST_COMMENTS_TEXT, POST_COMMENTS_DATE, PARENT_COMMENTS_ID)
+	    VALUES (POST_COMMENTS_SEQ.NEXTVAL, #{postId}, #{userId}, #{comments}, SYSDATE, #{parentCommentId})
+	</insert>
     
-    <delete id="deleteComments">
-    	DELETE FROM post_comments
-    	WHERE post_comments_id = #{postCommentsId}
-    </delete>
+	<delete id="deleteComments">
+	    DELETE FROM POST_COMMENTS
+	    WHERE POST_COMMENTS_ID = #{postCommentsId} OR PARENT_COMMENTS_ID = #{postCommentsId}
+	</delete>
     
-    <select id="getComments" resultType="com.tech.whale.community.dto.CommentDto">
-		SELECT post_comments_id, user_id, post_comments_text, 
-		TO_CHAR(post_comments_date, 'YYYY"년" MM"월" DD"일" HH24"시 "MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS post_comments_date
-		FROM post_comments
-		WHERE post_id = #{postId}
-		ORDER BY post_comments_date ASC
+	<select id="getComments" resultMap="CommentResultMap">
+	    SELECT 
+	        c.POST_COMMENTS_ID,
+	        c.USER_ID,
+	        c.POST_COMMENTS_TEXT,
+	        TO_CHAR(c.POST_COMMENTS_DATE, 'YYYY"년" MM"월" DD"일" HH24"시 "MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS POST_COMMENTS_DATE,
+	        c.PARENT_COMMENTS_ID,
+	        u.USER_IMAGE_URL,
+	        (SELECT COUNT(*) FROM POST_COMMENTS_LIKE pcl WHERE pcl.POST_COMMENTS_ID = c.POST_COMMENTS_ID) AS LIKE_COUNT,
+	        (SELECT COUNT(*) FROM POST_COMMENTS pc WHERE pc.PARENT_COMMENTS_ID = c.POST_COMMENTS_ID) AS REPLY_COUNT
+	    FROM POST_COMMENTS c
+	    JOIN USER_INFO u ON c.USER_ID = u.USER_ID
+	    WHERE c.POST_ID = #{postId} AND c.PARENT_COMMENTS_ID IS NULL
+	    ORDER BY c.POST_COMMENTS_DATE ASC
+	</select>
+	
+	<select id="getReplies" resultMap="CommentResultMap">
+	    SELECT 
+	        c.POST_COMMENTS_ID,
+	        c.USER_ID,
+	        c.POST_COMMENTS_TEXT,
+	        TO_CHAR(c.POST_COMMENTS_DATE, 'YYYY"년" MM"월" DD"일" HH24"시 "MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS POST_COMMENTS_DATE,
+	        c.PARENT_COMMENTS_ID,
+	        u.USER_IMAGE_URL,
+	        (SELECT COUNT(*) FROM POST_COMMENTS_LIKE pcl WHERE pcl.POST_COMMENTS_ID = c.POST_COMMENTS_ID) AS LIKE_COUNT
+	    FROM POST_COMMENTS c
+	    JOIN USER_INFO u ON c.USER_ID = u.USER_ID
+	    WHERE c.PARENT_COMMENTS_ID = #{parentCommentId}
+	    ORDER BY c.POST_COMMENTS_DATE ASC
+	</select>
+    
+    <select id="checkUserLikedComment" resultType="int">
+	    SELECT COUNT(*)
+	    FROM POST_COMMENTS_LIKE
+	    WHERE POST_COMMENTS_ID = #{commentId} AND USER_ID = #{userId}
+	</select>
+	
+	<!-- 댓글 좋아요 추가 -->
+	<insert id="insertCommentLike">
+	    INSERT INTO POST_COMMENTS_LIKE (POST_COMMENTS_LIKE_ID, POST_COMMENTS_ID, USER_ID)
+	    VALUES (POST_COMMENTS_LIKE_SEQ.NEXTVAL, #{commentId}, #{userId})
+	</insert>
+	
+	<!-- 댓글 좋아요 취소 -->
+	<delete id="deleteCommentLike">
+	    DELETE FROM POST_COMMENTS_LIKE
+	    WHERE POST_COMMENTS_ID = #{commentId} AND USER_ID = #{userId}
+	</delete>
+	
+	<!-- 댓글의 총 좋아요 수 -->
+	<select id="getCommentLikeCount" resultType="int">
+	    SELECT COUNT(*)
+	    FROM POST_COMMENTS_LIKE
+	    WHERE POST_COMMENTS_ID = #{commentId}
+	</select>
+    
+    <select id="getCommentsCount" resultType="int">
+        SELECT COUNT(*)
+        FROM POST_COMMENTS
+        WHERE POST_ID = #{postId}
     </select>
+    
     
         <!-- 게시글 등록 쿼리 -->
 	<select id="getNextPostId" resultType="int">
 	    SELECT POST_SEQ.NEXTVAL FROM DUAL
 	</select>
+	
+	<select id="getNextPostMusicId" resultType="int">
+		SELECT POST_MUSIC_SEQ.NEXTVAL FROM DUAL
+	</select>
+	
 	
 	<insert id="insertPost">
 	    INSERT INTO POST (POST_ID, COMMUNITY_ID, USER_ID, POST_TITLE, POST_TEXT, POST_NUM, POST_DATE, POST_TAG_ID, POST_CNT)
@@ -173,11 +291,10 @@
 	            (SELECT NVL(MAX(POST_NUM), 0) + 1 FROM POST WHERE COMMUNITY_ID = #{community_id}), -- POST_NUM 계산
 	            SYSDATE, #{post_tag_id}, 0)
 	</insert>
-
-    <!-- 이미지 정보 등록 쿼리 -->
-	<insert id="insertImage" parameterType="com.tech.whale.community.dto.PostImgDto">
-	    INSERT INTO POST_IMG (POST_IMG_ID, POST_ID, POST_IMG_URL, POST_IMG_TYPE, POST_IMG_NAME)
-	    VALUES (POST_IMG_SEQ.NEXTVAL, #{post_id}, #{post_img_url}, #{post_img_type}, #{post_img_name})
+	
+	<insert id="insertPostMusic">
+		INSERT INTO POST_MUSIC (POST_MUSIC_ID, POST_ID, TRACK_ID)
+		VALUES (#{post_music_id}, #{post_id}, #{track_id})
 	</insert>
 	
 	<select id="getPostNumById" resultType="String">
@@ -195,9 +312,17 @@
 	    AND POST_NUM > #{postNum}
 	</update>
     
-    <delete id="deletePostImage" parameterType="int">
-	    DELETE FROM POST_IMG WHERE POST_IMG_ID = #{imageId}
-	</delete>
+    <update id="updatePostMusic">
+        UPDATE POST_MUSIC 
+        SET TRACK_ID = #{trackId} 
+        WHERE POST_ID = #{postId}
+    </update>
+
+    <!-- 음악 정보 삭제 -->
+    <delete id="deletePostMusic">
+        DELETE FROM POST_MUSIC 
+        WHERE POST_ID = #{postId}
+    </delete>
     
     <update id="updatePost" parameterType="com.tech.whale.community.dto.PostDto">
         UPDATE POST
@@ -206,5 +331,33 @@
             post_text = #{post_text}
         WHERE post_id = #{post_id}
     </update>
+    
+    <update id="addCommunityBookmark">
+	    UPDATE COMMUNITY
+	    SET COMMUNITY_FOLLOW = CASE 
+	        WHEN COMMUNITY_FOLLOW IS NULL THEN #{userId}
+	        ELSE COMMUNITY_FOLLOW || ',' || #{userId}
+	    END
+	    WHERE COMMUNITY_ID = #{communityId}
+	      AND (COMMUNITY_FOLLOW IS NULL OR INSTR(COMMUNITY_FOLLOW, #{userId}) = 0)
+	</update>
+    
+    <update id="removeCommunityBookmark">
+	    UPDATE COMMUNITY
+	    SET COMMUNITY_FOLLOW = TRIM(',' FROM REPLACE(',' || COMMUNITY_FOLLOW || ',', ',' || #{userId} || ',', ','))
+	    WHERE COMMUNITY_ID = #{communityId}
+	      AND (COMMUNITY_FOLLOW LIKE '%,' || #{userId} || ',%'
+	           OR COMMUNITY_FOLLOW LIKE #{userId} || ',%'
+	           OR COMMUNITY_FOLLOW LIKE '%,' || #{userId}
+	           OR COMMUNITY_FOLLOW = #{userId})
+	</update>
+    
+    <select id="isCommunityBookmarkedByUser" resultType="int">
+	    SELECT COUNT(*)
+	    FROM COMMUNITY
+	    WHERE COMMUNITY_ID = #{communityId}
+	      AND INSTR(COMMUNITY_FOLLOW, #{userId}) > 0
+	</select>
+    
     
 </mapper>

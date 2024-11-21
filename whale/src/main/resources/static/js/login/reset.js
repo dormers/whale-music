@@ -48,6 +48,9 @@ $(document).ready(function() {
       },
       error: function(err) {
         console.error('비밀번호 재설정 중 오류 발생:', err);
+        console.log('에러 응답 내용:', err.responseText); // 응답 텍스트 확인
+        console.log('에러 상태 코드:', err.status);      // HTTP 상태 코드 확인
+        console.log('에러 상세 내용:', err);             // 전체 에러 객체 출력
         $('#message').text('비밀번호를 재설정하는 중 오류가 발생했습니다. 다시 시도해주세요.').css('color', 'red');
       }
     });

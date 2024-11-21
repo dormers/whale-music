@@ -5,7 +5,7 @@
 <html>
 <head>
 	
-    <title>계정관리</title>
+    <title>관리자메인</title>
     <link rel="stylesheet" href="/whale/static/css/admin/menubar/adminSideBar.css">
     <c:if test="${not empty subBarBlockCss}">
         <link rel="stylesheet" href="${subBarBlockCss}">

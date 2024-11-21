@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tech.whale.search.models.SearchDao">
+
+	<select id="selectSearchUserInfo" resultType="com.tech.whale.setting.dto.UserInfoDto">
+        SELECT
+        	USER_ID AS user_id,
+        	USER_NICKNAME AS user_nickname,
+        	USER_IMAGE_URL AS user_image_url
+        FROM
+        	USER_INFO
+        ORDER BY USER_ID, USER_NICKNAME
+    </select>
+
+	<select id="selectSearchPostInfo" resultType="com.tech.whale.community.dto.PostDto">
+		SELECT
+			P.POST_ID AS post_id,
+			P.COMMUNITY_ID AS community_id,
+			P.USER_ID AS user_id,
+			P.POST_TITLE AS post_title,
+			P.POST_TEXT AS post_text,
+			P.POST_DATE AS post_date,
+			PM.TRACK_ID AS track_id,
+			PT.POST_TAG_TEXT AS post_tag_text,
+			UI.USER_NICKNAME AS user_nickname,
+			UI.USER_IMAGE_URL AS user_image_url
+		FROM
+			POST P
+				LEFT JOIN POST_MUSIC PM ON PM.POST_ID = P.POST_ID
+				LEFT JOIN POST_TAG PT ON PT.POST_TAG_ID = P.POST_TAG_ID
+				LEFT JOIN USER_INFO UI ON UI.USER_ID = P.USER_ID
+		ORDER BY P.POST_DATE DESC, P.POST_ID DESC
+	</select>
+
+	<select id="selectSearchFeedInfo" resultType="com.tech.whale.feed.dto.FeedDto">
+        SELECT
+			F.FEED_ID AS feed_id,
+			F.USER_ID AS user_id,
+			F.FEED_TEXT AS feed_text,
+			F.FEED_DATE AS feed_date,
+			FI.FEED_IMG_NAME AS feed_img_name,
+			FI.FEED_IMG_URL AS feed_img_url,
+			FM.TRACK_ID AS track_id,
+			FT.FEED_TAG_TEXT AS feed_tag_text,
+			UI.USER_NICKNAME AS user_nickname,
+			UI.USER_IMAGE_URL AS user_image_url
+        FROM
+        	FEED F
+        		LEFT JOIN FEED_MUSIC FM ON FM.FEED_ID = F.FEED_ID
+        		LEFT JOIN FEED_TAG FT ON FT.FEED_ID = F.FEED_ID
+        		LEFT JOIN USER_INFO UI ON UI.USER_ID = F.USER_ID
+				LEFT JOIN FEED_IMG FI ON FI.FEED_ID = F.FEED_ID
+				LEFT JOIN USER_SETTING US ON US.USER_ID = F.USER_ID
+				LEFT JOIN FOLLOW FL ON FL.USER_ID = F.USER_ID
+        WHERE
+        	F.FEED_OPEN = 0
+        	AND
+        	(
+        		US.ACCOUNT_PRIVACY = 0
+        		OR
+        		(
+        			US.ACCOUNT_PRIVACY = 1
+        			AND
+        			(
+        				(SELECT COUNT(*) FROM FOLLOW WHERE USER_ID = F.USER_ID AND FOLLOW_USER_ID LIKE '%'||#{userId}||'%') = 1
+        				OR
+        				F.USER_ID = #{userId}
+        			)
+        		)
+        	)
+        ORDER BY F.FEED_DATE DESC, F.FEED_ID DESC
+    </select>
+    
+</mapper>

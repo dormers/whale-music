@@ -30,4 +30,11 @@ public class FeedDto {
     private List<FeedCommentDto> feedComments; // 피드에 달린 댓글 리스트
     private int likeCount;
     private int commentsCount;
+    
+    private int feed_music_id;
+    private String track_id;
+    private String track_artist;
+    private String track_name;
+    private String track_album;
+    private String track_cover;
 }

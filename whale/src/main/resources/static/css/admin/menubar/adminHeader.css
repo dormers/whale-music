@@ -1,6 +1,7 @@
 
 .mainview{
 	display: flex;
+	position: relative;
 	left:0;
 	top:0;
 	width:100%;
@@ -8,6 +9,8 @@
 	margin-top:0;
 	padding-top:0;	
 	flex-direction: column;
+	
+	margin-left: 200px;
 }
 .contentview{
 	min-width: 1400px;
@@ -15,23 +18,26 @@
 	flex-direction: row;
 	width:100%;
 	height:95%;
+	margin-top: 80px;
 }
 .pagename{
 	display:flex;
-	position: relative;
-	background-color: #aaa;
+	position: fixed;
+	background-color: #293846;
 	margin: 0;
 	height: 80px;
 	width: 100%;
-	min-width: 1500px;
+	min-width: 1700px;
 	/* flex-grow:1; */
-	color: #333;
+	color: #fff;
 	line-height: 80px;
-	top:0;
+	top: 0;
+	left: 0;
 	padding-top:0;
 	font-size: 30px;
 	font-weight: bold;
 	align-items: center;
+    z-index: 1000;
 }
 .pagename div{
 	margin-left:0;
@@ -43,5 +49,13 @@
 	transform: translateX(-50%);
 	height: 80px;
 	object-fit: contain;
-    
+    scale: .8;
+    filter: invert(1);
+}
+#header-pname{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 200px;
+	opacity: 0.9;
 }

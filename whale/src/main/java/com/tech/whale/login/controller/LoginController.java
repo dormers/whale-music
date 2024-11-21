@@ -56,11 +56,21 @@ public class LoginController {
         boolean isAuthenticated = userService.authenticate(username, password);
 
         if (isAuthenticated) {
-            session.setAttribute("logged_in", true);  // 새로운 세션 생성
-            session.setAttribute("user_id", username);
-            userService.checkAccessIdLogin(username, session);
-            // 여기서 리디렉션 경로 수정
-            return "redirect:/spotify/login";
+        	Integer status = userService.getUserStatusService(username);
+        	
+        	if (status == 1) {
+        		session.invalidate();
+        		model.addAttribute("message","suspension");
+        		model.addAttribute("date",userService.getUserEndDateService(username).toString());
+                return "login/login";
+        	}
+        	else {
+        		session.setAttribute("logged_in", true);  // 새로운 세션 생성
+                session.setAttribute("user_id", username);
+                userService.checkAccessIdLogin(username, session);
+                // 여기서 리디렉션 경로 수정
+                return "redirect:/spotify/login";
+        	}
         } else {
             model.addAttribute("message",false);
             return "login/login";
@@ -91,27 +101,35 @@ public class LoginController {
 
     @RequestMapping("/spotify/callback")
     public String callback(HttpServletRequest req, HttpSession session) {
+    	
+    	try {
+    		// 기존 로그인 로직
+            mainAuthorizationCodeController.execute(req, session);
 
-        // 기존 로그인 로직
-        mainAuthorizationCodeController.execute(req, session);
+            // 스포티파이 API를 통해 인증된 사용자 정보 가져오기
+            String[] spotifyInfo = getSpotifyInfo(req, session);
 
-        // 스포티파이 API를 통해 인증된 사용자 정보 가져오기
-        String spotifyEmail = getSpotifyEmail(req, session);
+            // 유저 정보를 세션에 저장
+            session.setAttribute("spotifyEmail", spotifyInfo[0]);
+            session.setAttribute("spotifyId", spotifyInfo[1]);
 
-        // 이메일 정보를 세션에 저장
-        session.setAttribute("spotifyEmail", spotifyEmail);
-
-        // 세션 값에 따라 리디렉션 처리
-        String isRegistered = (String) session.getAttribute("authFlow");
-        if ("register".equals(isRegistered)) {
-            return "redirect:/register";
-        } else {
-            return "redirect:/main";
-        }
+            // 세션 값에 따라 리디렉션 처리
+            String isRegistered = (String) session.getAttribute("authFlow");
+            if ("register".equals(isRegistered)) {
+                return "redirect:/register";
+            } else if (session.getAttribute("access_id").toString().equals("1")) {
+            	return "redirect:/admin/adminMainView";
+            } else {
+                return "redirect:/main";
+            }
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/";
+		}
     }
 
-    // 스포티파이 API를 사용해서 이메일 가져오는 메서드
-    public String getSpotifyEmail(HttpServletRequest req, HttpSession session) {
+    // 스포티파이 API를 사용해서 유저 정보 가져오는 메서드
+    public String[] getSpotifyInfo(HttpServletRequest req, HttpSession session) {
         // 스포티파이에서 토큰을 얻는 과정
         String accessToken = (String) session.getAttribute("accessToken");
 
@@ -128,8 +146,9 @@ public class LoginController {
             GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = spotifyApi.getCurrentUsersProfile().build();
             User user = getCurrentUsersProfileRequest.execute();
             String email = user.getEmail();  // 사용자 이메일 가져오기
+            String spotifyId = user.getId();  // 사용자 이메일 가져오기
 
-            return email;
+            return new String[] {email, spotifyId};
 
         } catch (SpotifyWebApiException | IOException | ParseException e) {
             // 엑세스 토큰이 만료된 경우, 리프레시 토큰을 사용해 새로운 엑세스 토큰을 발급받고 다시 시도
@@ -139,7 +158,10 @@ public class LoginController {
                     spotifyApi = new SpotifyApi.Builder().setAccessToken(accessToken).build();
                     GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = spotifyApi.getCurrentUsersProfile().build();
                     User user = getCurrentUsersProfileRequest.execute();
-                    return user.getEmail();
+                    String email = user.getEmail();  // 사용자 이메일 가져오기
+                    String spotifyId = user.getId();  // 사용자 이메일 가져오기
+
+                    return new String[] {email, spotifyId};
                 } catch (IOException | SpotifyWebApiException | ParseException ex) {
                     ex.printStackTrace();
                     return null;

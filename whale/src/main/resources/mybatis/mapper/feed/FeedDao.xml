@@ -9,9 +9,18 @@
 		SELECT FEED_SEQ.NEXTVAL FROM DUAL
 	</select>
 
+	<select id="getNextFeedMusicId" resultType="int">
+		SELECT FEED_MUSIC_SEQ.NEXTVAL FROM DUAL
+	</select>
+
 	<insert id="insertFeed">
 		INSERT INTO FEED (FEED_ID, USER_ID, FEED_TEXT, FEED_DATE, FEED_OPEN)
 		VALUES (#{feed_id}, #{user_id}, #{feed_text}, SYSDATE, 0)
+	</insert>
+	
+	<insert id="insertFeedMusic">
+		INSERT INTO FEED_MUSIC (FEED_MUSIC_ID, FEED_ID, TRACK_ID)
+		VALUES (#{feed_music_id}, #{feed_id}, #{track_id})
 	</insert>
 
 	<insert id="insertImage" parameterType="com.tech.whale.feed.dto.FeedImgDto">
@@ -21,50 +30,71 @@
 
 
 	<select id="getFeeds" resultMap="feedResultMap">
-		SELECT *
-		FROM (
-				 SELECT f.FEED_ID, f.USER_ID, f.FEED_TEXT, f.FEED_DATE, f.FEED_URL, f.FEED_OPEN,
-						u.USER_NICKNAME, u.USER_IMAGE_URL, fi.FEED_IMG_NAME,
-						(SELECT COUNT(*) FROM feed_like fl WHERE fl.FEED_ID = f.FEED_ID) AS likeCount,
-						(SELECT COUNT(*) FROM feed_comments fc WHERE fc.FEED_ID = f.FEED_ID) AS commentsCount,  -- 댓글 수 추가
-						ROW_NUMBER() OVER (ORDER BY f.FEED_DATE DESC) AS rn  -- ROW_NUMBER()로 페이징 처리
-				 FROM feed f
-						  JOIN user_info u ON f.USER_ID = u.USER_ID
-						  LEFT JOIN feed_img fi ON f.FEED_ID = fi.FEED_ID
-				 WHERE f.USER_ID = #{now_id}  -- 내 글
-					OR f.USER_ID IN (
-					 SELECT user_id FROM follow
-					 WHERE REGEXP_LIKE(follow_user_id, '(^|,)' || #{now_id} || '(,|$)')
-				 )
-			 )
-		WHERE rn BETWEEN #{offset} + 1 AND #{offset} + #{size}
+	    SELECT *
+	    FROM (
+	        SELECT f.FEED_ID, f.USER_ID, f.FEED_TEXT, f.FEED_DATE, f.FEED_URL, f.FEED_OPEN,
+	               u.USER_NICKNAME, u.USER_IMAGE_URL, fi.FEED_IMG_URL, t.TRACK_ID,
+	               t.TRACK_ARTIST, t.TRACK_NAME, t.TRACK_ALBUM, t.TRACK_COVER,
+	               (SELECT COUNT(*) FROM feed_like fl WHERE fl.FEED_ID = f.FEED_ID) AS likeCount,
+	               (SELECT COUNT(*) FROM feed_comments fc WHERE fc.FEED_ID = f.FEED_ID) AS commentsCount,
+	               ROW_NUMBER() OVER (ORDER BY f.FEED_DATE DESC) AS rn
+	        FROM feed f
+	            JOIN user_info u ON f.USER_ID = u.USER_ID
+	            LEFT JOIN feed_img fi ON f.FEED_ID = fi.FEED_ID
+	            LEFT JOIN feed_music fm ON f.FEED_ID = fm.FEED_ID
+	            LEFT JOIN track t ON fm.TRACK_ID = t.TRACK_ID
+	        WHERE (f.USER_ID = #{now_id}
+	            OR f.USER_ID IN (
+	                SELECT user_id FROM follow
+	                WHERE REGEXP_LIKE(follow_user_id, '(^|,)' || #{now_id} || '(,|$)')
+	            ))
+	            AND f.FEED_OPEN = 0
+	    )
+	    WHERE rn BETWEEN #{offset} + 1 AND #{offset} + #{size}
 	</select>
 
 	<select id="getFeedsProfile" resultMap="feedResultMap">
 		SELECT
 			f.FEED_ID, f.USER_ID, f.FEED_TEXT, f.FEED_DATE, f.FEED_URL, f.FEED_OPEN,
-			fi.FEED_IMG_NAME
+			fi.FEED_IMG_URL, t.TRACK_ID,
+	        t.TRACK_ARTIST, t.TRACK_NAME, t.TRACK_ALBUM, t.TRACK_COVER
 		FROM feed f
-				 LEFT JOIN feed_img fi ON f.FEED_ID = fi.FEED_ID
+		LEFT JOIN feed_img fi ON f.FEED_ID = fi.FEED_ID
+		LEFT JOIN feed_music fm ON f.FEED_ID = fm.FEED_ID
+		LEFT JOIN track t ON fm.TRACK_ID = t.TRACK_ID
 		WHERE f.USER_ID = #{userId}
+		AND f.FEED_OPEN = 0
 		ORDER BY f.FEED_DATE DESC
 	</select>
 
 	<select id="getFeedOne" resultMap="feedResultMap">
-		SELECT F.FEED_ID,
-			   F.USER_ID,
-			   F.FEED_TEXT,
-			   TO_CHAR(F.FEED_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS FEED_DATE,
-			   I.FEED_IMG_ID, -- 이미지 ID 추가
-			   I.FEED_IMG_URL, -- 이미지 경로
-			   I.FEED_IMG_NAME, -- 이미지 이름
-			   I.FEED_IMG_TYPE, -- 이미지 타입
-			   U.USER_NICKNAME, -- 유저 닉네임 추가
-			   U.USER_IMAGE_URL -- 유저 프로필 이미지 추가
-		FROM FEED F
-				 JOIN USER_INFO U ON F.USER_ID = U.USER_ID -- 유저 정보를 위한 조인
-				 LEFT JOIN FEED_IMG I ON F.FEED_ID = I.FEED_ID -- 이미지 경로를 위한 LEFT JOIN
-		WHERE F.FEED_ID = #{param1}
+	    SELECT 
+	        F.FEED_ID,
+	        F.USER_ID,
+	        F.FEED_TEXT,
+	        F.FEED_OPEN,
+	        TO_CHAR(F.FEED_DATE, 'YYYY"년" MM"월" DD"일" HH24"시" MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS FEED_DATE,
+	        I.FEED_IMG_ID, -- 이미지 ID 추가
+	        I.FEED_IMG_URL, -- 이미지 경로
+	        I.FEED_IMG_NAME, -- 이미지 이름
+	        I.FEED_IMG_TYPE, -- 이미지 타입
+	        U.USER_NICKNAME, -- 유저 닉네임 추가
+	        U.USER_IMAGE_URL, -- 유저 프로필 이미지 추가
+	        T.TRACK_ID,
+	        T.TRACK_ARTIST,
+	        T.TRACK_NAME,
+	        T.TRACK_ALBUM,
+	        T.TRACK_COVER,
+	        -- 좋아요 수 추가
+	        (SELECT COUNT(*) FROM feed_like fl WHERE fl.FEED_ID = F.FEED_ID) AS likeCount,
+	        -- 댓글 수 추가
+	        (SELECT COUNT(*) FROM feed_comments fc WHERE fc.FEED_ID = F.FEED_ID) AS commentsCount
+	    FROM FEED F
+	        JOIN USER_INFO U ON F.USER_ID = U.USER_ID -- 유저 정보를 위한 조인
+	        LEFT JOIN FEED_IMG I ON F.FEED_ID = I.FEED_ID -- 이미지 경로를 위한 LEFT JOIN
+	        LEFT JOIN FEED_MUSIC FM ON FM.FEED_ID = F.FEED_ID
+	        LEFT JOIN TRACK T ON T.TRACK_ID = FM.TRACK_ID
+	    WHERE F.FEED_ID = #{param1}
 	</select>
 
 	<select id="checkUserLikedFeed" resultType="int">
@@ -89,6 +119,17 @@
 		WHERE feed_id = #{feedId}
 	</select>
 
+	<update id="hideFeed">
+		UPDATE FEED
+		SET FEED_OPEN = 1
+		WHERE FEED_ID = #{param1}
+	</update>
+	
+	<update id="openFeed">
+		UPDATE FEED
+		SET FEED_OPEN = 0
+		WHERE FEED_ID = #{param1}
+	</update>
 
 	<insert id="insertComments">
 		INSERT INTO feed_comments (feed_comments_id, feed_id, user_id, feed_comments_text, feed_comments_date)
@@ -100,30 +141,59 @@
 		WHERE feed_comments_id = #{feedCommentsId}
 	</delete>
 
-	<select id="getComments" resultType="com.tech.whale.feed.dto.FeedCommentDto">
-		SELECT feed_comments_id, user_id, feed_comments_text,
-			   TO_CHAR(feed_comments_date, 'YYYY"년" MM"월" DD"일" HH24"시 "MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS feed_comments_date
-		FROM feed_comments
-		WHERE feed_id = #{feedId}
-		ORDER BY feed_comments_date ASC
-	</select>
+    <select id="getComments" resultType="com.tech.whale.feed.dto.FeedCommentDto">
+		SELECT 
+		    fc.feed_comments_id, fc.feed_id,
+		    fc.user_id, 
+		    fc.feed_comments_text, 
+		    TO_CHAR(fc.feed_comments_date, 'YYYY"년" MM"월" DD"일" HH24"시 "MI"분"', 'NLS_DATE_LANGUAGE = KOREAN') AS feed_comments_date,
+		    ui.user_image_url, -- 유저 이미지 URL
+		    COALESCE(COUNT(fcl.feed_comments_id), 0) AS likeCount, -- 좋아요 수
+		    (
+		        SELECT COUNT(*) 
+		        FROM feed_comments sub_fc 
+		        WHERE sub_fc.parent_comments_id = fc.feed_comments_id
+		    ) AS replyCount -- 답글 수
+		FROM 
+		    feed_comments fc
+		JOIN 
+		    user_info ui ON fc.user_id = ui.user_id -- user_info와 조인
+		LEFT JOIN 
+		    feed_comments_like fcl ON fc.feed_comments_id = fcl.feed_comments_id -- feed_comments_like와 LEFT JOIN
+		WHERE 
+		    fc.feed_id = #{feedId}
+		AND 
+		    fc.parent_comments_id IS NULL
+		GROUP BY 
+		    fc.feed_comments_id, fc.feed_id, fc.user_id, fc.feed_comments_text, fc.feed_comments_date, ui.user_image_url
+		ORDER BY 
+		    fc.feed_comments_date ASC
+    </select>
 
-
+    <delete id="deleteFeed">
+    	DELETE FROM FEED WHERE FEED_ID = #{param1}
+    </delete>
 
 	<resultMap id="feedResultMap" type="com.tech.whale.feed.dto.FeedDto">
 		<id property="feed_id" column="FEED_ID" />
 		<result property="user_id" column="USER_ID" />
 		<result property="feed_text" column="FEED_TEXT" />
+		<result property="feed_open" column="FEED_OPEN" />
 		<result property="feed_date" column="FEED_DATE" />
 		<result property="feed_url" column="FEED_URL" />
 		<result property="feed_open" column="FEED_OPEN" />
-
+	    <result property="track_id" column="TRACK_ID" />
+	    <result property="track_artist" column="TRACK_ARTIST" />
+	    <result property="track_name" column="TRACK_NAME" />
+	    <result property="track_album" column="TRACK_ALBUM" />
+	    <result property="track_cover" column="TRACK_COVER" />
 		<!-- 유저 정보 -->
 		<result property="user_nickname" column="USER_NICKNAME" />
 		<result property="user_image_url" column="USER_IMAGE_URL" />
 
 		<!-- 피드 이미지 -->
 		<result property="feed_img_name" column="FEED_IMG_NAME" />  <!-- 단일 이미지 매핑 -->
+		<result property="feed_img_url" column="FEED_IMG_URL" />  <!-- 단일 이미지 매핑 -->
 
 		<!-- 좋아요 개수 -->
 		<result property="likeCount" column="likeCount" />

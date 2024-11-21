@@ -42,7 +42,6 @@ public class SpotifyController {
     public HashMap<String, Object> refreshAccessToken(HttpSession session) {
         HashMap<String, Object> response = new HashMap<>();
         String refreshToken = (String) session.getAttribute("refreshToken");
-        session.setAttribute("refreshToken", refreshToken);
 
         // 로그 추가 - 리프레시 토큰 및 클라이언트 정보 확인
         System.out.println("Refresh Token: " + refreshToken);

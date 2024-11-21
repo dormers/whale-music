@@ -1,75 +1,243 @@
-* {margin: 0; padding: 0; box-sizing: 0;}
+#main.dark{background: #1f1f1f;}
+
+* {margin: 0; padding: 0; box-sizing: border-box;}
 body {min-height: 100vh;}
 ::-webkit-scrollbar {display: none;}
+#headerLogo > img{scale: .8;}
 
-.flexCenter {display: flex; justify-content: center; align-items: center;}
+#main.dark .flexCenter {display: flex; justify-content: center; align-items: center;}
+#main.dark .footer.flexCenter {background: #2e2e2e;}
 
-.header {position: relative; display: flex; justify-content: space-between; width: 100%; height: 80px; background-color: #fcfcfc; border-bottom: 1.5px solid #E2E2E2;}
-.headerItems {width: 200px;}
-#headerLogo:hover {cursor: grab;}
-#headerContents {display: flex;}
-#headerAlarm {width: 47%;}
-#headerAlarm:hover {opacity: 0.6; cursor: grab;}
-#headerAlarm:active {background-color: #efefef; opacity: 0.4; cursor: grab;}
-#headerProfile {width: 47%;}
-#headerMargin {width: 15%;}
-#profile {width: 60px; height: 60px; border: 3.5px solid #E2E2E2; border-radius: 50%;}
-#profile:hover {cursor: grab;}
-#adminRedirect {width: 45px; height: 45px; margin-right: 60px; opacity: 0.8;}
-#adminRedirect:hover {opacity: 0.6; cursor: grab;}
-#adminRedirect:active {opacity: 0.4; cursor: grab;}
+.header {position: relative; display: flex; justify-content: space-between; width: 100%; height: 80px;}
+#main.dark > .header{background-color: #1f1f1f;}
+#main.dark .headerItems {width: 200px;}
+#main.dark #headerLogo{filter: invert(1);}
+#main.dark #headerLogo:hover {cursor: grab;}
+#main.dark #headerContents {display: flex;}
+#main.dark #headerAlarm {position: relative; width: 47%; background-color: #1f1f1f !important;}
+#main.dark #headerAlarm:hover {opacity: 0.6; cursor: grab;}
+#main.dark #headerAlarm:active {background-color: #efefef; opacity: 0.4; cursor: grab;}
+#main.dark #headerAlarm > img{filter: invert(1);}
+#main.dark #header-noti-count {position: absolute; right: 8px; bottom: 8px; width: 18px; height: 18px; border: 1.5px solid #B2B2B2; border-radius: 50%; color: #fff;}
+#main.dark #header-noti-count-font {font-size: 11.5px; font-weight: 400; letter-spacing: 0.3px; opacity: 0.4;}
+#main.dark #headerProfile {width: 47%; background-color: #1f1f1f !important;}
+#main.dark #headerMargin {width: 15%;}
+#main.dark #profile {width: 60px; height: 60px; border: 2px solid #7f7f7f; border-radius: 50%;}
+#main.dark #profile:hover {cursor: grab;}
+#main.dark #adminRedirect {width: 45px; height: 45px; margin-right: 60px; opacity: 0.8; filter: invert(1);}
+#main.dark #adminRedirect:hover {opacity: 0.6; cursor: grab;}
+#main.dark #adminRedirect:active {opacity: 0.4; cursor: grab;}
 
-.headerMenu-wrap {position: absolute; width: 100%; height: 100%; background: rgba(252,252,252,0.2);}
-.headerMenu-containers {position: absolute; right: 0px; width: 350px; height: 300px;}
-.headerMenu-container {position: absolute; right: 0px; background-color: #ffffff; border-left: 2px solid #E2E2E2; border-right: 2px solid #E2E2E2; border-bottom: 2px solid #E2E2E2; border-bottom-left-radius: 6%; border-bottom-right-radius: 6%;}
-.header-contents {width: 100%; height: 55px; border-bottom: 0.5px solid #E2E2E2;}
-.header-contents:hover {background-color: #E2E2E2; opacity: 0.6; cursor: grab;}
-.header-contents:active {background-color: #E2E2E2; opacity: 0.4; cursor: grab;}
-.header-alarm-content {font-size: 14px; font-weight: 400; letter-spacing: 0.6px; opacity: 0.6;}
-.header-profile-content {font-size: 13px; font-weight: 400; letter-spacing: 0.5px; opacity: 0.6;}
-.header-nick-content {font-size: 14px; font-weight: 600; letter-spacing: 0.3px; opacity: 0.7;}
-.header-expanded-content {width: 100%; height: 150px; border-bottom: 0.5px solid #E2E2E2; overflow: auto; -ms-overflow-style: none;}
-.header-notification {width: 100%; height: 45px;}
-.header-notification:hover {background-color: #E2E2E2; opacity: 0.6; cursor: grab;}
-.header-notification:active {background-color: #E2E2E2; opacity: 0.4; cursor: grab;}
-.header-notification-content {font-size: 12px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.6;}
-#headerMenu-alarm {width: 90%; height: 100%; overflow: auto; -ms-overflow-style: none;}
-#headerMenu-profile {width: 78%; height: 225px;}
+#main.dark .headerMenu-wrap {position: absolute; width: 100%; height: 100%; background: rgba(252,252,252,0.2);}
+#main.dark .headerMenu-containers {position: absolute; right: 0px; width: 350px; height: 300px; color: whitesmoke;}
+#main.dark .headerMenu-container {position: absolute; right: 0px; background-color: #1f1f1f; border-left: 2px solid #8a8a8a; border-right: 2px solid #8a8a8a; border-bottom: 2px solid #8a8a8a; border-bottom-left-radius: 6%; border-bottom-right-radius: 6%;}
+#main.dark .header-contents {position: relative; width: 100%; height: 55px; border-bottom: 0.5px solid #8a8a8a;}
+#main.dark .header-contents:hover {background-color: #E2E2E2; opacity: 0.6; cursor: grab;}
+#main.dark .header-contents:active {background-color: #E2E2E2; opacity: 0.4; cursor: grab;}
+#main.dark .header-alarm-content {font-size: 14px; font-weight: 400; letter-spacing: 0.6px; opacity: 0.6;}
+#main.dark .header-contents:hover .header-alarm-content{color: #111;}
+#main.dark .header-profile-content {font-size: 13px; font-weight: 400; letter-spacing: 0.5px; opacity: 0.6;}
+#main.dark .header-contents:hover .header-profile-content {color: #111;}
+#main.dark .header-nick-content {font-size: 14px; font-weight: 600; letter-spacing: 0.3px; opacity: 0.7;}
+#main.dark .header-expanded-content {width: 100%; height: 150px; border-bottom: 0.5px solid #E2E2E2; overflow: auto; -ms-overflow-style: none;}
+#main.dark .header-notification {position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 55px;}
+#main.dark .header-notification:hover {background-color: #E2E2E2; opacity: 0.6;}
+#main.dark .header-notification:active {background-color: #E2E2E2; opacity: 0.4;}
+#main.dark .header-notification-content {line-height: 16px; font-size: 12px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.6; user-select: none;}
+#main.dark .header-noti-menu-counts {position: absolute; right: 22px; font-size: 12px; font-weight: 400; letter-spacing: 0.5px; opacity: 0.3;}
+#main.dark .header-contents:hover .header-noti-menu-counts{color: #111;}
+#main.dark .hearder-delete-noti {position: absolute; right: 10px; width: 10px; height: 10px; font-size: 13px; font-weight: 400; opacity: 0.4;}
+#main.dark .hearder-delete-noti:hover {opacity: 0.6; cursor: grab;}
+#main.dark .hearder-delete-noti:active {opacity: 0.4; cursor: grab;}
+#main.dark .hearder-follow-noti {display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 1.5px; font-size: 11px; font-weight: 600; opacity: 0.4; user-select: none;}
+#main.dark .header-follow-select:hover {opacity: 0.6; cursor: grab;}
+#main.dark .header-follow-select:active {opacity: 0.4; cursor: grab;}
+#main.dark #headerMenu-alarm {width: 90%; height: 100%; overflow: auto; -ms-overflow-style: none;}
+#main.dark #headerMenu-profile {width: 78%; height: 225px;}
 
-.main {position: relative; display: flex; width: 100%; background-color: #fcfcfc;}
-.mainItems {width: 50%;}
-.frame {position: relative; width: 94%; height: 94%; border: none; border-radius: 30px;}
+#main.dark .main {position: relative; display: flex; width: 100%; background-color: #2e2e2e;}
+#main.dark .mainItems {width: 50%;}
+#main.dark .frame {position: relative; width: 94%; height: 94%; border: none; border-radius: 30px; box-sizing: border-box; background: #1f1f1f;}
 
-.menu-style {background-image: linear-gradient(to bottom, #ffffff, #fcfcfc);}
-.menuBtn {position: absolute; bottom: 22.5px; left: 50%; transform: translate(-50%,0%); width: 55px; height: 55px; border-radius: 50%; opacity: 0.8;}
-.menuBtn:hover {opacity: 0.7; cursor: grab;}
-.menuBtn:active {opacity: 0.6; cursor: grab;}
-.menuBtn-square {width: 12px; height: 12px; border: 1px solid #cdcdcd; border-radius: 20%;}
-.menuDock {position: absolute; bottom: 19px; left: 50%; transform: translate(-50%,0%); width: 350px; height: 62px; border-radius: 20px; opacity: 0.7;}
-.menuDock-icon {opacity: 0.5; margin: 0 11px;}
-.menuDock-icon:hover {opacity: 0.4; cursor: grab;}
-.menuDock-icon:active {opacity: 0.3; cursor: grab;}
+#main.dark .menu-style {background-image: linear-gradient(to bottom, #ffffff, #fcfcfc);}
+#main.dark .menuBtn {position: absolute; bottom: 30px; left: 50%; transform: translate(-50%,0%); width: 45px; height: 45px; border-radius: 50%; opacity: 0.8;}
+#main.dark .menuBtn:hover {opacity: 0.7; cursor: grab;}
+#main.dark .menuBtn:active {opacity: 0.6; cursor: grab;}
+#main.dark .menuBtn-square {width: 12px; height: 12px; border: 1px solid #cdcdcd; border-radius: 20%;}
+#main.dark .menuDock {position: absolute; bottom: 19px; left: 50%; transform: translate(-50%,0%); width: 350px; height: 62px; border-radius: 20px; opacity: 0.7;}
+#main.dark .menuDock-icon {opacity: 0.5; margin: 0 11px;}
+#main.dark .menuDock-icon:hover {opacity: 0.4; cursor: grab;}
+#main.dark .menuDock-icon:active {opacity: 0.3; cursor: grab;}
 
 .footer {position: relative; width: 100%; height: 70px;}
-.player {display: flex; justify-content: space-between; width: 99%; height: 100%; border: 1.8px solid #E2E2E2; border-radius: 20px;}
-.playerComponent {width: 15%; height: 100%;}
+#main.dark .player {display: flex; justify-content: space-between; width: 99%; height: 100%; border-radius: 20px; background: #1f1f1f;}
+.playerComponent {width: 28%; height: 100%;}
 .footerMargin {width: 100%; height: 10px;}
+#main.dark .footerMargin {background: #2e2e2e;}
 #playerLeft {display: flex; align-items: center; margin-left: 30px;}
 #playerRight {display: flex; flex-direction: row-reverse; align-items: center; margin-right: 20px;}
 
-.playerRightStyle {display: flex; flex-direction: column; justify-content: center; margin: 0 15px;}
-.playerTrackName {font-size: 12px; font-weight: 400; letter-spacing: 0.4px; opacity: 0.8;}
-.playerArtistName {font-size: 11px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.8;}
-.playerImg {border-radius: 50%;}
-.playerImg:hover {cursor: grab;}
-.playerImg:active {opacity: 0.3; cursor: grab;}
-.playerBtn {background-color: transparent; border: none; margin: 0 20px;}
-.playerBtn:hover {opacity: 0.8;}
-.playerBtn:active {opacity: 0.6;}
-.playerRightMargin {margin: 0 15px;}
-.playerFullScreenImg {opacity: 0.5;}
-.playerFullScreenImg:hover {opacity: 0.4; cursor: grab;}
-.playerFullScreenImg:active {opacity: 0.3; cursor: grab;}
+#main.dark .playerRightStyle {display: flex; flex-direction: column; justify-content: center; margin: 0 15px; color: #fff;}
+#main.dark .playerTrackName {font-size: 12px; font-weight: 400; letter-spacing: 0.4px; opacity: 0.8;}
+#main.dark .playerArtistName {font-size: 11px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.8;}
+#main.dark .playerInfo:hover {opacity: 0.6; cursor: grab;}
+#main.dark .playerInfo:active {opacity: 0.4; cursor: grab;}
+#main.dark .playerImg {border-radius: 50%; background: #ffffffc2;}
+#main.dark .playerImg:hover {cursor: grab;}
+#main.dark .playerImg:active {opacity: 0.3; cursor: grab;}
+#main.dark .playerBtn {background-color: transparent; border: none; margin: 0 20px;}
+#main.dark #playerRight > button > img{filter: invert(1);}
+#main.dark .playerBtn:hover {opacity: 0.8;}
+#main.dark .playerBtn:active {opacity: 0.6;}
+#main.dark .playerRightMargin {margin: 0 15px;}
 
-.menuTransition-enter-active, .menuTransition-leave-active {transition: opacity 0.5s ease;}
-.menuTransition-enter-from, .menuTransition-leave-to {opacity: 0;}
+#main.dark .player-bar-container {display: flex; align-items: center; width: 100%; border-radius: 20px; opacity: 1;}
+#main.dark .playerTime {font-size: 10px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.7; color: #fff;}
+#main.dark .volume-bar-container {display: flex; align-items: center; width: 80px; margin-right: 15px;}
+
+#main.dark input[type=range] {width:100%; -webkit-appearance: none; background: transparent; border: 1px solid #9f9f9fcc;}
+#main.dark input[type=range]:focus::-webkit-slider-runnable-track {background: transparent;}
+#main.dark input[type=range]:focus {outline: none;}
+#main.dark .player-bar {margin-left: 5px; margin-right: 5px; border-radius: 2px;}
+#main.dark .player-bar::-webkit-slider-thumb {-webkit-appearance: none; background: #ffffff; cursor: pointer; border: 1px solid #e2e2e2; border-radius: 50%; width: 7px; height: 4px; margin-top: -0.26px;}
+#main.dark .player-bar::-webkit-slider-thumb:hover {width: 12px; height: 12px; margin-top: -3.6px;}
+#main.dark .player-bar::-webkit-slider-runnable-track {width: 100%; height: 4.5px; cursor: pointer; background: transparent; border-radius: 4px;}
+#main.dark .volume-bar {border-radius: 12px;}
+#main.dark .volume-bar::-webkit-slider-thumb {-webkit-appearance: none; background: #ffffff; cursor: pointer; border: 1px solid #e2e2e2; border-radius: 50%; width: 7px; height: 5.5px; margin-top: -0.25px;}
+#main.dark .volume-bar::-webkit-slider-thumb:hover {width: 12px; height: 12px; margin-top: -3.7px;}
+#main.dark .volume-bar::-webkit-slider-runnable-track {width: 80px; height: 5.5px; cursor: pointer; background: transparent; border-radius: 4px;}
+
+#main.dark .playerPlaylistContainer {position: absolute; bottom: 85px; right: 10px; width: 360px; height: 410px; border: 1.8px solid #8a8a8a; border-radius: 10px; background-color: #1f1f1f; overflow: auto; -ms-overflow-style: none;}
+#main.dark .playlistBody {position: relative; display: flex; flex-direction: column;}
+#main.dark .playlist-delete {position: absolute; right: 15px; top: 8px; font-size: 25px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.7; color: whitesmoke;}
+#main.dark .playlist-delete:hover {opacity: 0.5; cursor: grab;}
+#main.dark .playlist-delete:active {opacity: 0.3; cursor: grab;}
+#main.dark .playlist-header {width: 100%; height: 55px; margin-bottom: 10px; border-bottom: 0.5px solid #E2E2E2; font-size: 14px; font-weight: 400; letter-spacing: 0.6px; opacity: 0.6; color: whitesmoke;}
+#main.dark .playlist-contents {display: grid; grid-template-columns: 15% 85%; width: 90%; height: 100%; margin: 5px 18px; padding: 5px 0 5px 0; border-radius: 10px; background: #434343;}
+#main.dark .playlist-contents:hover {background-color: #6d6d6d;}
+#main.dark .playlist-contents:active {background-color: #6d6d6d;}
+#main.dark .playlist-font {font-size: 15px; font-weight: 300; letter-spacing: 0.4px; opacity: 0.7; color: whitesmoke;}
+
+#main.dark .menuTransition-enter-active, .menuTransition-leave-active {transition: opacity 0.5s ease;}
+#main.dark .menuTransition-enter-from, .menuTransition-leave-to {opacity: 0;}
+
+#main.dark .playerTrackName{white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px;}
+
+#notification-container {position: fixed; top: 90px; left: 20px; z-index: 1000;}
+.notification {display: flex; align-items: center; background-color: white; color: #333; padding: 15px 20px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; opacity: 0.9; transition: opacity 0.5s ease, transform 0.5s ease; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);}
+.notification:hover {opacity: 1; transform: translateY(-2px);}
+.notification img {margin-right: 10px;}
+.notification .text-content {display: flex; flex-direction: column; margin-top: 4px;}
+
+#main.dark .notification {border: none; background-color: #335580; color: white;}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+#main.light > *{
+    /*filter: invert(100%);*/
+    /*filter: invert(100%) !important;*/
+}
+
+#main.light .flexCenter {display: flex; justify-content: center; align-items: center;}
+
+#main.light > header{background-color: #fcfcfc; border-bottom: 1.5px solid #E2E2E2;}
+#main.light .headerItems {width: 200px;}
+#main.light #headerLogo:hover {cursor: grab;}
+#main.light #headerContents {display: flex;}
+#main.light #headerAlarm {position: relative; width: 47%;}
+#main.light #headerAlarm:hover {opacity: 0.6; cursor: grab;}
+#main.light #headerAlarm:active {background-color: #efefef; opacity: 0.4; cursor: grab;}
+#main.light #header-noti-count {position: absolute; right: 8px; bottom: 8px; width: 18px; height: 18px; border: 1.5px solid #B2B2B2; border-radius: 50%;}
+#main.light #header-noti-count-font {font-size: 11.5px; font-weight: 400; letter-spacing: 0.3px; opacity: 0.4;}
+#main.light #headerProfile {width: 47%;}
+#main.light #headerMargin {width: 15%;}
+#main.light #profile {width: 60px; height: 60px; border: 3.5px solid #E2E2E2; border-radius: 50%;}
+#main.light #profile:hover {cursor: grab;}
+#main.light #adminRedirect {width: 45px; height: 45px; margin-right: 60px; opacity: 0.8;}
+#main.light #adminRedirect:hover {opacity: 0.6; cursor: grab;}
+#main.light #adminRedirect:active {opacity: 0.4; cursor: grab;}
+
+#main.light .headerMenu-wrap {position: absolute; width: 100%; height: 100%; background: rgba(252,252,252,0.2);}
+#main.light .headerMenu-containers {position: absolute; right: 0px; width: 350px; height: 300px;}
+#main.light .headerMenu-container {position: absolute; right: 0px; background-color: #ffffff; border-left: 2px solid #E2E2E2; border-right: 2px solid #E2E2E2; border-bottom: 2px solid #E2E2E2; border-bottom-left-radius: 6%; border-bottom-right-radius: 6%;}
+#main.light .header-contents {position: relative; width: 100%; height: 55px; border-bottom: 0.5px solid #E2E2E2;}
+#main.light .header-contents:hover {background-color: #E2E2E2; opacity: 0.6; cursor: grab;}
+#main.light .header-contents:active {background-color: #E2E2E2; opacity: 0.4; cursor: grab;}
+#main.light .header-alarm-content {font-size: 14px; font-weight: 400; letter-spacing: 0.6px; opacity: 0.6;}
+#main.light .header-profile-content {font-size: 13px; font-weight: 400; letter-spacing: 0.5px; opacity: 0.6;}
+#main.light .header-nick-content {font-size: 14px; font-weight: 600; letter-spacing: 0.3px; opacity: 0.7;}
+#main.light .header-expanded-content {width: 100%; height: 150px; border-bottom: 0.5px solid #E2E2E2; overflow: auto; -ms-overflow-style: none;}
+#main.light .header-notification {position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 55px;}
+#main.light .header-notification:hover {background-color: #E2E2E2; opacity: 0.6;}
+#main.light .header-notification:active {background-color: #E2E2E2; opacity: 0.4;}
+#main.light .header-notification-content {line-height: 16px; font-size: 12px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.6; user-select: none;}
+#main.light .header-noti-menu-counts {position: absolute; right: 22px; font-size: 12px; font-weight: 400; letter-spacing: 0.5px; opacity: 0.3;}
+#main.light .hearder-delete-noti {position: absolute; right: 10px; width: 10px; height: 10px; font-size: 13px; font-weight: 400; opacity: 0.4;}
+#main.light .hearder-delete-noti:hover {opacity: 0.6; cursor: grab;}
+#main.light .hearder-delete-noti:active {opacity: 0.4; cursor: grab;}
+#main.light .hearder-follow-noti {display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 1.5px; font-size: 11px; font-weight: 600; opacity: 0.4; user-select: none;}
+#main.light .header-follow-select:hover {opacity: 0.6; cursor: grab;}
+#main.light .header-follow-select:active {opacity: 0.4; cursor: grab;}
+#main.light #headerMenu-alarm {width: 90%; height: 100%; overflow: auto; -ms-overflow-style: none;}
+#main.light #headerMenu-profile {width: 78%; height: 225px;}
+
+#main.light .main {position: relative; display: flex; width: 100%; background-color: #fcfcfc;}
+#main.light .mainItems {width: 50%;}
+#main.light .frame {position: relative; width: 94%; height: 94%; border: none; border-radius: 30px; border: 2px solid #f0f0f0; box-sizing: border-box;}
+
+#main.light .menu-style {background-image: linear-gradient(to bottom, #1f1f1f, #2e2e2e);}
+#main.light .menuBtn {position: absolute; bottom: 30px; left: 50%; transform: translate(-50%,0%); width: 45px; height: 45px; border-radius: 50%; opacity: 0.8;}
+#main.light .menuBtn:hover {opacity: 0.7; cursor: grab;}
+#main.light .menuBtn:active {opacity: 0.6; cursor: grab;}
+#main.light .menuBtn-square {width: 12px; height: 12px; border: 1px solid #cdcdcd; border-radius: 20%;}
+#main.light .menuDock {position: absolute; bottom: 19px; left: 50%; transform: translate(-50%,0%); width: 350px; height: 62px; border-radius: 20px; opacity: 0.7;}
+#main.light .menuDock-icon {opacity: 0.5; margin: 0 11px; filter: invert(1);}
+#main.light .menuDock-icon:hover {opacity: 0.4; cursor: grab;}
+#main.light .menuDock-icon:active {opacity: 0.3; cursor: grab;}
+
+#main.light .player {display: flex; justify-content: space-between; width: 99%; height: 100%; border: 1.8px solid #E2E2E2; border-radius: 20px;}
+
+#main.light .playerRightStyle {display: flex; flex-direction: column; justify-content: center; margin: 0 15px;}
+#main.light .playerTrackName {font-size: 12px; font-weight: 400; letter-spacing: 0.4px; opacity: 0.8;}
+#main.light .playerArtistName {font-size: 11px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.8;}
+#main.light .playerInfo:hover {opacity: 0.6; cursor: grab;}
+#main.light .playerInfo:active {opacity: 0.4; cursor: grab;}
+#main.light .playerImg {border-radius: 50%;}
+#main.light .playerImg:hover {cursor: grab;}
+#main.light .playerImg:active {opacity: 0.3; cursor: grab;}
+#main.light .playerBtn {background-color: transparent; border: none; margin: 0 20px;}
+#main.light .playerBtn:hover {opacity: 0.8;}
+#main.light .playerBtn:active {opacity: 0.6;}
+#main.light .playerRightMargin {margin: 0 15px;}
+
+#main.light .player-bar-container {display: flex; align-items: center; width: 100%; border-radius: 20px;}
+#main.light .playerTime {font-size: 10px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.7;}
+#main.light .volume-bar-container {display: flex; align-items: center; width: 80px; margin-right: 15px;}
+
+#main.light input[type=range] {width:100%; -webkit-appearance: none; background: transparent;}
+#main.light input[type=range]:focus::-webkit-slider-runnable-track {background: transparent;}
+#main.light input[type=range]:focus {outline: none;}
+#main.light .player-bar {margin-left: 5px; margin-right: 5px; border-radius: 2px;}
+#main.light .player-bar::-webkit-slider-thumb {-webkit-appearance: none; background: #ffffff; cursor: pointer; border: 1px solid #e2e2e2; border-radius: 50%; width: 7px; height: 4px; margin-top: -0.26px;}
+#main.light .player-bar::-webkit-slider-thumb:hover {width: 12px; height: 12px; margin-top: -3.6px;}
+#main.light .player-bar::-webkit-slider-runnable-track {width: 100%; height: 4.5px; cursor: pointer; background: transparent; border-radius: 4px;}
+#main.light .volume-bar {border-radius: 12px;}
+#main.light .volume-bar::-webkit-slider-thumb {-webkit-appearance: none; background: #ffffff; cursor: pointer; border: 1px solid #e2e2e2; border-radius: 50%; width: 7px; height: 5.5px; margin-top: -0.25px;}
+#main.light .volume-bar::-webkit-slider-thumb:hover {width: 12px; height: 12px; margin-top: -3.7px;}
+#main.light .volume-bar::-webkit-slider-runnable-track {width: 80px; height: 5.5px; cursor: pointer; background: transparent; border-radius: 4px;}
+
+#main.light .playerPlaylistContainer {position: absolute; bottom: 85px; right: 10px; width: 360px; height: 410px; border: 1.8px solid #E2E2E2; border-radius: 10px; background-color: #ffffff; overflow: auto; -ms-overflow-style: none;}
+#main.light .playlistBody {position: relative; display: flex; flex-direction: column;}
+#main.light .playlist-delete {position: absolute; right: 15px; top: 8px; font-size: 25px; font-weight: 200; letter-spacing: 0.4px; opacity: 0.7;}
+#main.light .playlist-delete:hover {opacity: 0.5; cursor: grab;}
+#main.light .playlist-delete:active {opacity: 0.3; cursor: grab;}
+#main.light .playlist-header {width: 100%; height: 55px; margin-bottom: 10px; border-bottom: 0.5px solid #E2E2E2; font-size: 14px; font-weight: 400; letter-spacing: 0.6px; opacity: 0.6;}
+#main.light .playlist-contents {display: grid; grid-template-columns: 15% 85%; width: 90%; height: 100%; margin: 5px 18px; padding: 5px 0 5px 0; border-radius: 10px; background: #f0f0f0;}
+#main.light .playlist-contents:hover {background-color: #E2E2E2;}
+#main.light .playlist-contents:active {background-color: #E2E2E2;}
+#main.light .playlist-font {font-size: 15px; font-weight: 300; letter-spacing: 0.4px; opacity: 0.7;}
+
+#main.light .menuTransition-enter-active, .menuTransition-leave-active {transition: opacity 0.2s ease;}
+#main.light .menuTransition-enter-from, .menuTransition-leave-to {opacity: 0;}
+
+#main.light .playerTrackName{white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px;}

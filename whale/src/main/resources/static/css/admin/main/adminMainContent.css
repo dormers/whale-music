@@ -1,6 +1,5 @@
 body{
-	background-color: #ddd;
-	
+	background-color: #f0f0f0;
 }
 
 .mainContent {
@@ -8,96 +7,150 @@ body{
 	position: relative;
 	flex-direction: row;
 	flex-grow: 1;
-    margin:0 5px;
+    margin: 0;
+    padding: 0;
     height: 100%;
-	width:100%;
+	width: 100%;
     min-width: 800px;
 }
 #memo{
 	width:500px;
 	/* height:88vh; */
-	height: 88vh;
+	height: 85.5vh;
 	border-radius: 10px;
-	background-color: white;
 	padding: 10px;
 	text-align: center;
 	color: white;
 	background-color: #293846;
 	box-sizing: border-box;
-	margin:10px;
+	margin: 30px auto 10px auto;
 }
 #memo textarea{
 	border: none;
-	resize: none;
-	width:450px;
-	height:80vh;
+	/* resize: none; */
+	width:390px;
+	height:66vh;
 	border-radius: 10px;
-	padding:5px;
+	padding:30px;
 	outline: none;
-	font-size:20px;
+	font-size: 16px;
+	font-weight: 400;
+	letter-spacing: 0.3px;
+	line-height: 22px;
+	overflow-y: auto;
+	resize: none;
+}
+#memo p{
+	padding: 14px 0;
+	margin: 0;
+}
+#memo input[type="submit"]{
+	padding: 6px 10px;
+	margin: 0 0 0 25px;
+	border: none;
+	border-radius: 2px;
+	background-color: white;
 }
 .blockContainer{
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
-	margin: 10px 5px 0 0;
+	gap: 30px;
+	margin: 30px 30px 0 40px;
+	padding: 0;
 	align-items: flex-start;
+	width: 1100px;
+}
+.blockContainer p{
+	margin: 0;
+	padding: 20px 0 0 0;
+	cursor: pointer;
+	text-align: center;
+	font-size: 22px;
+	font-weight: 400;
+	letter-spacing: 0.4px;
+	opacity: 0.8;
 }
 .divStep{
 	display: flex;
 	flex-direction: row;
-	flex-grow: 1;
+	gap: 30px;
+	width: 1100px;
+	margin: 0;
+	padding: 0;
 }
 .block{
 	display: flex;
 	font-size: 25px;
-	background-color: white;
 	border-radius: 10px;
 	flex-grow: 1;
-	margin:5px;
-	padding: 5px 10px;
+	margin: 0;
+	padding: 0;
 	background-color: white;
-	
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	flex-direction: column;
+}
+.block div{
+	margin: auto;
+	padding: 0 0 20px 0;
+	font-size: 18px;
+	font-weight: 400;
+	letter-spacing: 0.4px;
+	line-height: 30px;
+	opacity: 0.8;
 }
 #block1{
 	width:290px;
-	height: 170px;
+	height: 190px;
 }
+
 #block2{
 	width:190px;
-	height: 170px;
+	height: 190px;
 }
 #block3{
 	width:190px;
-	height: 170px;
+	height: 190px;
 }
 #block4{
 	width:190px;
-	height: 170px;
+	height: 190px;
 }
 #block5{
-	width:350px;
-	height: 170px;
+	width:400px;
+	height: 190px;
+	padding: 0 20px;
+}
+.block5-name{
+	height:50px;
+}
+#block5 a{
+	color: black;
+	text-decoration: none;
+}
+.block5-7{
+	width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	font-size: 16px;
+	font-weight: 400;
+	letter-spacing: 0.4px;
+	line-height: 30px;
+	opacity: 0.8;
 }
 #block6{
 	width:270px;
-	height: 170px;
+	height: 190px;
 }
 #block7{
-	width:270px;
-	height: 170px;
+	width:500px;
+	height: 190px;
+	padding: 0 20px;
 }
 #block8{
-	width:950px;
+	width:1100px;
 	height: 350px;
 }
-
-
-
-
-
-
-
-
-
-
+#block8 canvas{
+	width:1050px;
+	height: 290px;
+}

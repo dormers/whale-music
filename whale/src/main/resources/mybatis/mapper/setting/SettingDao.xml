@@ -1,69 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.tech.whale.setting.dao.SettingDao">
 	<resultMap id="notificationResultMap" type="map">
-	    <result column="ALL_NOTIFICATION_OFF" property="all_notification_off"/>
-	    <result column="LIKE_NOTIFICATION_ONOFF" property="like_notification_onoff"/>
-	    <result column="COMMENT_NOTIFICATION_ONOFF" property="comment_notification_onoff"/>
-	    <result column="MESSAGE_NOTIFICATION_ONOFF" property="message_notification_onoff"/>
+		<result column="ALL_NOTIFICATION_OFF" property="all_notification_off"/>
+		<result column="LIKE_NOTIFICATION_ONOFF" property="like_notification_onoff"/>
+		<result column="COMMENT_NOTIFICATION_ONOFF" property="comment_notification_onoff"/>
+		<result column="MESSAGE_NOTIFICATION_ONOFF" property="message_notification_onoff"/>
 	</resultMap>
-	<select id="getProfile" resultType="com.tech.whale.setting.dto.UserInfoDto"> 
-		SELECT USER_NICKNAME, USER_EMAIL, USER_IMAGE_URL, USER_PASSWORD FROM USER_INFO WHERE USER_ID = #{session_user_id}
+	<select id="getProfile" resultType="com.tech.whale.setting.dto.UserInfoDto">
+		SELECT UI.USER_NICKNAME, UI.USER_EMAIL, UI.USER_IMAGE_URL, UI.USER_TRACK_ID, T.TRACK_ARTIST, T.TRACK_NAME
+		FROM USER_INFO UI
+				 LEFT JOIN TRACK T
+						   ON UI.USER_TRACK_ID = T.TRACK_ID
+		WHERE USER_ID = #{session_user_id}
 	</select>
 	<update id="updateProfile">
-		UPDATE USER_INFO SET USER_NICKNAME = #{nickname}, USER_PASSWORD = #{password}, USER_IMAGE_URL = #{newProfileImage}, USER_EMAIL = #{email} WHERE USER_ID = #{session_user_id}
+		UPDATE user_info SET USER_NICKNAME = #{nickname}, USER_EMAIL = #{email}, USER_IMAGE_URL = #{userProfileImageUrl} WHERE USER_ID = #{userId}
+	</update>
+	
+	<select id="getCurrentProfileImage" parameterType="String" resultType="String">
+        SELECT user_image_url FROM user_info WHERE user_id = #{userId}
+    </select>
+	
+	<select id="getCurrentPassword" resultType="String">
+		SELECT USER_PASSWORD FROM USER_INFO WHERE USER_ID = #{session_user_id}
+	</select>
+	<update id="updatePassword">
+		UPDATE USER_INFO SET USER_PASSWORD = #{encodedPassword} WHERE USER_ID = #{session_user_id}
 	</update>
 	<update id="updateAccountPrivacy">
 		UPDATE USER_SETTING SET ACCOUNT_PRIVACY = #{accountPrivacy} WHERE USER_ID = #{session_user_id}
 	</update>
+	<select id="getFollowRequestList" resultType="String">
+		select follow_noti_user_id from follow_noti where user_id = #{session_user_id}
+	</select>
 	<update id="updateNotificationSettings">
-	    UPDATE USER_NOTIFICATION_ONOFF 
-	    SET 
-	        ALL_NOTIFICATION_OFF = #{allNotificationOff}, 
-	        LIKE_NOTIFICATION_ONOFF = #{likeNotificationOnoff}, 
-	        COMMENT_NOTIFICATION_ONOFF = #{commentNotificationOnoff}, 
-	        MESSAGE_NOTIFICATION_ONOFF = #{messageNotificationOnoff} 
-	    WHERE USER_ID = #{session_user_id}
+		UPDATE USER_NOTIFICATION_ONOFF
+		SET
+			ALL_NOTIFICATION_OFF = #{allNotificationOff},
+			LIKE_NOTIFICATION_ONOFF = #{likeNotificationOnoff},
+			COMMENT_NOTIFICATION_ONOFF = #{commentNotificationOnoff},
+			MESSAGE_NOTIFICATION_ONOFF = #{messageNotificationOnoff}
+		WHERE USER_ID = #{session_user_id}
 	</update>
 	<update id="updateLikeNotification">
-	    UPDATE USER_NOTIFICATION_ONOFF 
-	    SET 
-	        LIKE_NOTIFICATION_ONOFF = #{likeNotificationOnOff} 
-	    WHERE USER_ID = #{session_user_id}
+		UPDATE USER_NOTIFICATION_ONOFF
+		SET
+			LIKE_NOTIFICATION_ONOFF = #{likeNotificationOnOff}
+		WHERE USER_ID = #{session_user_id}
 	</update>
 	<update id="updateCommentNotification">
-	    UPDATE USER_NOTIFICATION_ONOFF 
-	    SET  
-	        COMMENT_NOTIFICATION_ONOFF = #{commentNotificationOnOff}
-	    WHERE USER_ID = #{session_user_id}
+		UPDATE USER_NOTIFICATION_ONOFF
+		SET
+			COMMENT_NOTIFICATION_ONOFF = #{commentNotificationOnOff}
+		WHERE USER_ID = #{session_user_id}
 	</update>
 	<update id="updateMessageNotification">
-	    UPDATE USER_NOTIFICATION_ONOFF 
-	    SET 
-	        MESSAGE_NOTIFICATION_ONOFF = #{messageNotificationOnOff} 
-	    WHERE USER_ID = #{session_user_id}
+		UPDATE USER_NOTIFICATION_ONOFF
+		SET
+			MESSAGE_NOTIFICATION_ONOFF = #{messageNotificationOnOff}
+		WHERE USER_ID = #{session_user_id}
 	</update>
-	<select id="getNotificationSettingsByUserId" parameterType="String" resultType="com.tech.whale.setting.dto.UserNotificationDto"> 
-		SELECT ALL_NOTIFICATION_OFF, LIKE_NOTIFICATION_ONOFF, COMMENT_NOTIFICATION_ONOFF, MESSAGE_NOTIFICATION_ONOFF 
-		FROM USER_NOTIFICATION_ONOFF 
+	<select id="getNotificationSettingsByUserId" resultType="com.tech.whale.setting.dto.UserNotificationDto">
+		SELECT ALL_NOTIFICATION_OFF, LIKE_NOTIFICATION_ONOFF, COMMENT_NOTIFICATION_ONOFF, MESSAGE_NOTIFICATION_ONOFF
+		FROM USER_NOTIFICATION_ONOFF
 		WHERE USER_ID = #{session_user_id}
 	</select>
-	<select id="getAccountPrivacyByUserId" resultType="com.tech.whale.setting.dto.UserSettingDto"> 
+	<select id="getAccountPrivacyByUserId" resultType="com.tech.whale.setting.dto.UserSettingDto">
 		SELECT ACCOUNT_PRIVACY FROM USER_SETTING WHERE USER_ID = #{session_user_id}
 	</select>
-	<select id="getBlockList" parameterType="String" resultType="com.tech.whale.setting.dto.BlockDto">
-	    SELECT UI.USER_ID, UI.USER_NICKNAME, UI.USER_IMAGE_URL
-		FROM BLOCK B
-		JOIN USER_INFO UI
-		ON B.BLOCK_USER_ID = UI.USER_ID
-		WHERE B.USER_ID = (SELECT USER_ID FROM USER_INFO WHERE USER_ID = #{session_user_id})
-	</select>
-	<delete id="unblockUser" parameterType="map">
-		DELETE FROM BLOCK WHERE USER_ID = #{session_user_id} AND BLOCK_USER_ID = #{block_userId}
-	</delete>
 	<select id="getDarkmode" resultType="com.tech.whale.setting.dto.UserSettingDto">
 		SELECT DARKMODE_SETTING_ONOFF FROM USER_SETTING WHERE USER_ID = #{session_user_id}
 	</select>
@@ -79,68 +87,80 @@
 			STARTPAGE_MUSIC_SETTING = CASE WHEN #{left} = 'music' THEN 1
 										   WHEN #{right} = 'music' THEN 2
 										   ELSE 0
-									  END,
+				END,
 			STARTPAGE_FEED_SETTING = CASE WHEN #{left} = 'feed' THEN 1
 										  WHEN #{right} = 'feed' THEN 2
-										  ELSE 0 
-									 END,
+										  ELSE 0
+				END,
 			STARTPAGE_COMMUNITY_SETTING = CASE WHEN #{left} = 'community' THEN 1
-									   		   WHEN #{right} = 'community' THEN 2
-									   		   ELSE 0 
-									   	  END,
+											   WHEN #{right} = 'community' THEN 2
+											   ELSE 0
+				END,
 			STARTPAGE_MESSAGE_SETTING = CASE WHEN #{left} = 'message' THEN 1
 											 WHEN #{right} = 'message' THEN 2
-											 ELSE 0 
-									    END
+											 ELSE 0
+				END
 		WHERE USER_ID = #{userId}
 	</update>
 	<select id="getPageAccessSetting" resultType="com.tech.whale.setting.dto.PageAccessDto">
-		SELECT PAGE_ACCESS_MYPAGE, PAGE_ACCESS_NOTIFICATION, PAGE_ACCESS_SETTING, PAGE_ACCESS_MUSIC 
-		FROM PAGE_ACCESS_SETTING 
+		SELECT PAGE_ACCESS_MYPAGE, PAGE_ACCESS_NOTIFICATION, PAGE_ACCESS_SETTING, PAGE_ACCESS_MUSIC, PAGE_ACCESS_MESSAGE
+		FROM PAGE_ACCESS_SETTING
 		WHERE USER_ID = #{session_user_id}
 	</select>
 	<update id="updatePageAccessSetting">
-	    UPDATE page_access_setting
-	    SET 
-	        page_access_mypage = 
-	            CASE 
-	                WHEN #{settingType} = 'mypage' AND #{selectedValue} = 'left' THEN 0
-	                WHEN #{settingType} = 'mypage' AND #{selectedValue} = 'right' THEN 1
-	                ELSE page_access_mypage
-	            END,
-	        page_access_notification = 
-	            CASE 
-	                WHEN #{settingType} = 'notification' AND #{selectedValue} = 'left' THEN 0
-	                WHEN #{settingType} = 'notification' AND #{selectedValue} = 'right' THEN 1
-	                ELSE page_access_notification
-	            END,
-	        page_access_setting = 
-	            CASE 
-	                WHEN #{settingType} = 'setting' AND #{selectedValue} = 'left' THEN 0
-	                WHEN #{settingType} = 'setting' AND #{selectedValue} = 'right' THEN 1
-	                ELSE page_access_setting
-	            END,
-	        page_access_music = 
-	            CASE 
-	                WHEN #{settingType} = 'music' AND #{selectedValue} = 'left' THEN 0
-	                WHEN #{settingType} = 'music' AND #{selectedValue} = 'right' THEN 1
-	                ELSE page_access_music
-	            END
-	    WHERE user_id = #{userId}
+		UPDATE page_access_setting
+		SET
+			page_access_mypage =
+				CASE
+					WHEN #{settingType} = 'mypage' AND #{selectedValue} = 'left' THEN 0
+					WHEN #{settingType} = 'mypage' AND #{selectedValue} = 'right' THEN 1
+					ELSE page_access_mypage
+					END,
+			page_access_notification =
+				CASE
+					WHEN #{settingType} = 'notification' AND #{selectedValue} = 'left' THEN 0
+					WHEN #{settingType} = 'notification' AND #{selectedValue} = 'right' THEN 1
+					ELSE page_access_notification
+					END,
+			page_access_setting =
+				CASE
+					WHEN #{settingType} = 'setting' AND #{selectedValue} = 'left' THEN 0
+					WHEN #{settingType} = 'setting' AND #{selectedValue} = 'right' THEN 1
+					ELSE page_access_setting
+					END,
+			page_access_music =
+				CASE
+					WHEN #{settingType} = 'music' AND #{selectedValue} = 'left' THEN 0
+					WHEN #{settingType} = 'music' AND #{selectedValue} = 'right' THEN 1
+					ELSE page_access_music
+					END,
+			page_access_message =
+				CASE
+					WHEN #{settingType} = 'message' AND #{selectedValue} = 'left' THEN 0
+					WHEN #{settingType} = 'message' AND #{selectedValue} = 'right' THEN 1
+					ELSE page_access_message
+					END
+		WHERE user_id = #{userId}
 	</update>
 	<select id="getFilteredPostLikeList" parameterType="map" resultType="com.tech.whale.setting.dto.LikeListDto">
 		<choose>
 			<when test="postType == '게시글'">
-				SELECT P.POST_ID, P.POST_TITLE, P.POST_TEXT
-				FROM POST P JOIN POST_LIKE PL
+				SELECT P.POST_ID, P.COMMUNITY_ID, P.POST_TITLE, P.POST_TEXT, PT.POST_TAG_TEXT, P.USER_ID, P.POST_DATE, P.POST_CNT,
+				(SELECT COUNT(*) FROM POST_LIKE PL_TOTAL WHERE PL_TOTAL.POST_ID = P.POST_ID) AS TOTAL_LIKE_COUNT, -- 게시글의 총 좋아요 개수
+				(SELECT COUNT(*) FROM POST_COMMENTS PC_TOTAL WHERE PC_TOTAL.POST_ID = P.POST_ID) AS TOTAL_COMMENT_COUNT -- 게시글의 총 댓글 개수
+				FROM POST P
+				JOIN POST_TAG PT
+				ON P.POST_TAG_ID = PT.POST_TAG_ID
+				JOIN POST_LIKE PL
 				ON P.POST_ID = PL.POST_ID
-				WHERE PL.USER_ID = #{session_user_id}
-				ORDER BY PL.POST_LIKE_ID ${orderBy }
+				WHERE PL.USER_ID = #{session_user_id} -- 내가 좋아요 누른 게시물만
+				ORDER BY PL.POST_LIKE_ID ${orderBy}
 			</when>
 			<otherwise>
-				SELECT F.FEED_ID, F.FEED_TITLE, F.FEED_TEXT
-				FROM FEED F JOIN FEED_LIKE FL
-				ON F.FEED_ID = FL.FEED_ID
+				SELECT FL.FEED_ID, FI.FEED_IMG_URL
+				FROM FEED_LIKE FL
+				JOIN FEED_IMG FI
+				ON FL.FEED_ID = FI.FEED_ID
 				WHERE FL.USER_ID = #{session_user_id}
 				ORDER BY FL.FEED_LIKE_ID ${orderBy }
 			</otherwise>
@@ -149,20 +169,89 @@
 	<select id="getFilteredPostCommentList" parameterType="map" resultType="com.tech.whale.setting.dto.CommentListDto">
 		<choose>
 			<when test="postType == '게시글'">
-				SELECT P.POST_TITLE, PC.POST_COMMENTS_TEXT
-				FROM POST_COMMENTS PC JOIN POST P
-				ON P.POST_ID = PC.POST_ID
+				SELECT
+				P.POST_ID,
+				PT.POST_TAG_TEXT,
+				P.COMMUNITY_ID,
+				P.POST_TITLE,
+				P.POST_TEXT,
+				UI.USER_IMAGE_URL AS POST_OWNER_IMAGE,
+				UI.USER_ID AS POST_OWNER_ID,
+				PC.POST_COMMENTS_ID,
+				PC.PARENT_COMMENTS_ID AS POST_PARENT_COMMENTS_ID,
+				UIC.USER_IMAGE_URL AS POST_COMMENTER_IMAGE,
+				PC.USER_ID AS POST_COMMENTER_ID,
+				PC.POST_COMMENTS_TEXT,
+				P.POST_DATE
+				FROM POST P
+				JOIN POST_TAG PT ON P.POST_TAG_ID = PT.POST_TAG_ID
+				JOIN USER_INFO UI ON P.USER_ID = UI.USER_ID  -- 게시글 작성자 정보
+				JOIN POST_COMMENTS PC ON P.POST_ID = PC.POST_ID
+				LEFT JOIN USER_INFO UIC ON PC.USER_ID = UIC.USER_ID  -- 댓글 작성자 정보
 				WHERE PC.USER_ID = #{session_user_id}
-				ORDER BY POST_COMMENTS_ID ${orderBy }
+				ORDER BY PC.POST_COMMENTS_DATE ${orderBy}, PC.POST_COMMENTS_ID ${orderBy}
 			</when>
 			<otherwise>
-				SELECT F.FEED_ID, F.FEED_TEXT, F.FEED_COMMENTS_TEXT
-				FROM FEED F JOIN FEED_COMMENTS FC
-				ON F.FEED_ID = FC.FEED_ID
+				SELECT
+				FI.FEED_ID,
+				FI.FEED_IMG_URL,
+				F.FEED_TEXT,
+				UI.USER_IMAGE_URL AS FEED_OWNER_IMAGE,
+				UI.USER_ID AS FEED_OWNER_ID,
+				FC.FEED_COMMENTS_ID,
+				FC.PARENT_COMMENTS_ID,
+				UIC.USER_IMAGE_URL AS COMMENTER_IMAGE,
+				FC.USER_ID AS COMMENTER_ID,
+				FC.FEED_COMMENTS_TEXT
+				FROM FEED F
+				JOIN FEED_IMG FI ON F.FEED_ID = FI.FEED_ID
+				JOIN USER_INFO UI ON F.USER_ID = UI.USER_ID  -- 피드 작성자 정보
+				JOIN FEED_COMMENTS FC ON F.FEED_ID = FC.FEED_ID
+				JOIN USER_INFO UIC ON FC.USER_ID = UIC.USER_ID  -- 댓글 작성자 정보
 				WHERE FC.USER_ID = #{session_user_id}
-				ORDER BY FC.FEED_LIKE_ID ${orderBy }
+				ORDER BY FC.FEED_COMMENTS_DATE ${orderBy}, FC.FEED_COMMENTS_ID ${orderBy}
 			</otherwise>
 		</choose>
 	</select>
-	
+	<select id="getFilteredPostReplyCommentList" parameterType="map" resultType="com.tech.whale.setting.dto.CommentListDto">
+		<choose>
+			<when test="postType == '게시글'">
+				SELECT
+				P.POST_ID AS RE_POST_ID,
+				PC.POST_COMMENTS_ID AS RE_POST_COMMENTS_ID,
+				PC.PARENT_COMMENTS_ID RE_POST_PARENT_COMMENTS_ID,
+				UIC.USER_IMAGE_URL AS RE_POST_COMMENTER_IMAGE,
+				PC.USER_ID AS RE_POST_COMMENTER_ID,
+				PC.POST_COMMENTS_TEXT AS RE_POST_COMMENTS_TEXT
+				FROM POST P
+				JOIN POST_COMMENTS PC ON P.POST_ID = PC.POST_ID
+				JOIN USER_INFO UIC ON PC.USER_ID = UIC.USER_ID
+				WHERE PC.USER_ID = #{session_user_id}
+				ORDER BY PC.POST_COMMENTS_ID
+			</when>
+			<otherwise>
+				SELECT
+				F.FEED_ID AS RE_FEED_ID,
+				FC.FEED_COMMENTS_ID AS RE_FEED_COMMENTS_ID,
+				FC.PARENT_COMMENTS_ID RE_PARENT_COMMENTS_ID,
+				UIC.USER_IMAGE_URL AS RE_COMMENTER_IMAGE,
+				FC.USER_ID AS RE_COMMENTER_ID,
+				FC.FEED_COMMENTS_TEXT AS RE_FEED_COMMENTS_TEXT
+				FROM FEED F
+				JOIN FEED_COMMENTS FC ON F.FEED_ID = FC.FEED_ID
+				JOIN USER_INFO UIC ON FC.USER_ID = UIC.USER_ID
+				WHERE FC.USER_ID = #{session_user_id}
+				ORDER BY FC.FEED_COMMENTS_ID
+			</otherwise>
+		</choose>
+	</select>
+	<select id="getHiddenFeedList" resultType="com.tech.whale.setting.dto.HiddenFeedDto">
+		SELECT F.FEED_ID, F.FEED_TEXT, FI.FEED_IMG_URL
+		FROM FEED F JOIN FEED_IMG FI
+						 ON F.FEED_ID = FI.FEED_ID
+		WHERE USER_ID = #{session_user_id} AND FEED_OPEN = 1
+	</select>
+	<update id="updateRepresentiveSong">
+		UPDATE USER_INFO SET USER_TRACK_ID = #{trackId} WHERE USER_ID = #{session_user_id}
+	</update>
 </mapper>

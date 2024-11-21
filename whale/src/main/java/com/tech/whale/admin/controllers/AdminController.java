@@ -8,32 +8,26 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tech.whale.admin.dao.AdminIDao;
 import com.tech.whale.admin.service.AdminAccountUserInfoService;
 import com.tech.whale.admin.service.AdminAccountUserListService;
+import com.tech.whale.admin.service.AdminAccountUserModifyService;
+import com.tech.whale.admin.service.AdminMainPageService;
+import com.tech.whale.admin.service.AdminUserImgDeleteService;
 import com.tech.whale.admin.service.AdminUserInfoCommentService;
 import com.tech.whale.admin.service.AdminUserInfoFeedService;
 import com.tech.whale.admin.service.AdminUserInfoPostService;
+import com.tech.whale.admin.service.AdminUserNicknameModifyService;
+import com.tech.whale.admin.service.AdminUserStatusLogListService;
 import com.tech.whale.admin.util.AdminSearchVO;
 import com.tech.whale.community.vo.SearchVO;
 
-
-/*
-
-- 광고 업무
-광고주가 신청서를 작성할 수 있는 양식. (페이지)
-광고를 심사하고 승인할 수 있는 양식(승인 거절 남김)
-승인된 광고 게시
-광고id, 제목, 내용, 이미지url, 광고주정보, 광고상태, 시작 종료날짜
-광고 기간에만 게시되도록 종료날짜에 광고 비활성화
-노출횟수, 클릭수, 광고종료시 연장 및 새로신청
-
-*/
-
-//   http://localhost:9002/whale/admin/adminMainView
 
 
 @Controller
@@ -50,29 +44,43 @@ public class AdminController {
 	private AdminUserInfoFeedService adminUserInfoFeedService;
 	@Autowired
 	private AdminUserInfoCommentService adminUserInfoCommentService;
-	
+	@Autowired
+	private AdminAccountUserModifyService adminAccountUserModifyService;
+	@Autowired
+	private AdminUserNicknameModifyService adminUserNicknameModifyService;
+	@Autowired
+	private AdminUserImgDeleteService adminUserImgDeleteService;
+	@Autowired
+	private AdminMainPageService adminMainPageService;
+	@Autowired
+	private AdminUserStatusLogListService adminUserStatusLogListService;
 	
 	@Autowired
 	private AdminIDao adminIDao;
 	
-	private String userId;
+	@ModelAttribute("myId")
+    public String addUserIdToModel(HttpSession session) {
+        return (String) session.getAttribute("user_id");
+    }
+	@ModelAttribute("myImgUrl")
+	public String myImgUrl(Model model,HttpSession session) {
+		String myId = (String) session.getAttribute("user_id");
+		String myImgSty = adminIDao.myImg(myId);
+		return myImgSty;
+	}
 	
 	public void accountSubBar(Model model) {
 	    Map<String, String> subMenu = new LinkedHashMap<>();
-	    subMenu.put("adminAccountOfficialListView", "오피셜관리");
-	    subMenu.put("adminAccountClientListView", "광고주관리");
 	    subMenu.put("adminAccountUserListView", "유저관리");
+	    subMenu.put("adminUserStatusLogListView", "정지내역");
 	    
 	    model.addAttribute("subMenu", subMenu);
 	}
-
 	
 	@RequestMapping("/adminMainView")
 	public String adminMainView(HttpServletRequest request,
 			HttpSession session,
 			Model model) {
-		
-		userId = (String) session.getAttribute("user_id");
 		
 		model.addAttribute("request", request);
 		model.addAttribute("pname", "HOME");
@@ -86,40 +94,22 @@ public class AdminController {
 	    		null);
 	    accountSubBar(model);
 	    
+	    adminMainPageService.execute(model);
+	    adminMainPageService.adminMemo(model);
+	    
+	    
 		return "/admin/view/adminMainView";
 	}
 	
-	@RequestMapping("/adminAccountOfficialListView")
-	public String adminAccountOfficialView(
-			HttpServletRequest request,
-			AdminSearchVO searchVO,
+	@RequestMapping("/adminMemoSave")
+	@Transactional
+	public String adminMemoSave(HttpServletRequest request,
 			Model model) {
 		model.addAttribute("request", request);
-		model.addAttribute("pname", "오피셜관리");
-		model.addAttribute("contentBlockJsp",
-				"../account/adminAccountOfficialContent.jsp");
-	    model.addAttribute("contentBlockCss",
-	    		"/whale/static/css/admin/account/adminAccountOfficialListContent.css");
-	    accountSubBar(model);
-	    
-		return "/admin/view/adminOutlineForm";
+		adminMainPageService.memoUpdate(model);
+		return "redirect:adminMainView";
 	}
 	
-	@RequestMapping("/adminAccountClientListView")
-	public String adminAccountClientView(
-			HttpServletRequest request,
-			AdminSearchVO searchVO,
-			Model model) {
-		model.addAttribute("request", request);
-		model.addAttribute("pname", "광고주관리");
-		model.addAttribute("contentBlockJsp",
-				"../account/adminAccountClientContent.jsp");
-	    model.addAttribute("contentBlockCss",
-	    		"/whale/static/css/admin/account/adminAccountClientListContent.css");
-	    accountSubBar(model);
-	    
-		return "/admin/view/adminOutlineForm";
-	}
 	
 	@RequestMapping("/adminAccountUserListView")
 	public String adminAccountUserListView(
@@ -131,57 +121,31 @@ public class AdminController {
 		model.addAttribute("searchVO", searchVO);
 		model.addAttribute("pname", "유저관리");
 		model.addAttribute("contentBlockJsp",
-				"../account/adminAccountUserContent.jsp");
+				"../account/adminAccountUserListContent.jsp");
 	    model.addAttribute("contentBlockCss",
 	    		"/whale/static/css/admin/account/adminAccountUserListContent.css");
 	    accountSubBar(model);
 	    
 	    adminAccountUserListService.execute(model);
-		
-		return "/admin/view/adminOutlineForm";
-	}
-	
-	
-	
-	@RequestMapping("/adminAccountAddView")
-	public String adminAccountAddView(
-			HttpServletRequest request,
-			AdminSearchVO searchVO ,
-			Model model) {
-		
-		model.addAttribute("request", request);
-		model.addAttribute("searchVO", searchVO);
-		model.addAttribute("pname", "권한추가");
-		model.addAttribute("contentBlockJsp",
-				"../account/adminAccountAddContent.jsp");
-	    model.addAttribute("contentBlockCss",
-	    		"/whale/static/css/admin/account/adminAccountAddContent.css");
-	    accountSubBar(model);
-	    
-		return "/admin/view/adminOutlineForm";
-	}
-	
-	
-	@RequestMapping("/adminMyInfoView")
-	public String adminMyInfoView(HttpServletRequest request, Model model) {
-		
-		model.addAttribute("request", request);
-		model.addAttribute("pname", "나의정보");
-		model.addAttribute("contentBlockJsp",
-				"../account/adminMyInfoContent.jsp");
-	    model.addAttribute("contentBlockCss",
-	    		null);
-	    accountSubBar(model);
+	    adminAccountUserInfoService.excuteArray(model);
 		return "/admin/view/adminOutlineForm";
 	}
 	
 	
 	@RequestMapping("/adminAccountUserInfo")
 	public String adminAccountUserInfo(
+			@RequestParam("page") int page,
+			@RequestParam("searchType") String searchType,
+			@RequestParam("sk") String sk,
+			@RequestParam("searchOrderBy") String searchOrderBy,
 			HttpServletRequest request,
-			SearchVO searchVO,
+			AdminSearchVO searchVO,
 			Model model) {
 		
+		model.addAttribute("searchOrderBy", searchOrderBy);
+		model.addAttribute("sk", sk);
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("page", page);
 		model.addAttribute("request", request);
 		model.addAttribute("searchVO", searchVO);
 		model.addAttribute("pname", "유저정보");
@@ -196,6 +160,144 @@ public class AdminController {
 		adminUserInfoFeedService.execute(model);
 		adminUserInfoCommentService.execute(model);
 		
+		return "/admin/view/adminOutlineForm";
+	}
+	
+	
+	@RequestMapping("/adminAccountUserModify")
+	public String adminAccountUserModify(
+			@RequestParam("page") int page,
+			@RequestParam("searchType") String searchType,
+			@RequestParam("sk") String sk,
+			@RequestParam("searchOrderBy") String searchOrderBy,
+			HttpServletRequest request,
+			Model model) {
+		
+		model.addAttribute("searchOrderBy", searchOrderBy);
+		model.addAttribute("sk", sk);
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("page", page);
+		model.addAttribute("request", request);
+		model.addAttribute("pname", "유저정보수정");
+		model.addAttribute("contentBlockJsp",
+				"../account/adminAccountUserModifyContent.jsp");
+		model.addAttribute("contentBlockCss",
+				"/whale/static/css/admin/account/adminAccountUserModifyContent.css");
+		accountSubBar(model);
+		
+		adminAccountUserModifyService.execute(model);
+		adminAccountUserInfoService.execute(model);
+		
+		return "/admin/view/adminOutlineForm";
+	}
+	
+	@RequestMapping("/adminUserAccessModify")
+	public String adminUserAccessModify(
+			@RequestParam("page") int page,
+			@RequestParam("searchType") String searchType,
+			@RequestParam("sk") String sk,
+			@RequestParam("searchOrderBy") String searchOrderBy,
+			HttpSession session,
+			HttpServletRequest request,
+			Model model) {
+		model.addAttribute("request", request);
+		String userId = request.getParameter("userId");
+		
+		adminAccountUserModifyService.modifyAccess(model,session);
+		
+		
+		return "redirect:adminAccountUserModify?"
+				+ "userId=" + userId
+				+ "&page=" + page
+				+ "&searchType=" + searchType
+				+ "&searchOrderBy=" + searchOrderBy
+				+ "&sk=" + sk;
+	}
+	
+	@RequestMapping("/adminUserStatusModify")
+	public String adminUserStatusModify(
+			@RequestParam("page") int page,
+			@RequestParam("searchType") String searchType,
+			@RequestParam("sk") String sk,
+			@RequestParam("searchOrderBy") String searchOrderBy,
+			HttpSession session,
+			HttpServletRequest request,
+			Model model) {
+		model.addAttribute("request", request);
+		String userId = request.getParameter("userId");
+		
+		adminAccountUserModifyService.modifyStatus(model,session);
+		
+		
+		return "redirect:adminAccountUserModify?"
+				+ "userId=" + userId
+				+ "&page=" + page
+				+ "&searchType=" + searchType
+				+ "&searchOrderBy=" + searchOrderBy
+				+ "&sk=" + sk;
+	}
+	
+	@RequestMapping("/adminUserNicknameModify")
+	public String adminUserNicknameModify(
+			@RequestParam("page") int page,
+			@RequestParam("searchType") String searchType,
+			@RequestParam("sk") String sk,
+			@RequestParam("searchOrderBy") String searchOrderBy,
+			HttpServletRequest request,
+			Model model) {
+		model.addAttribute("request", request);
+		String userId = request.getParameter("userId");
+		
+		adminUserNicknameModifyService.execute(model);
+		
+				
+		return "redirect:adminAccountUserModify?"
+				+ "userId=" + userId
+				+ "&page=" + page
+				+ "&searchType=" + searchType
+				+ "&searchOrderBy=" + searchOrderBy
+				+ "&sk=" + sk;
+	}
+	
+	@RequestMapping("/adminUserImgDelete")
+	public String adminUserImgDelete(
+			@RequestParam("page") int page,
+			@RequestParam("searchType") String searchType,
+			@RequestParam("sk") String sk,
+			@RequestParam("searchOrderBy") String searchOrderBy,
+			@RequestParam("userId") String userId,
+			HttpServletRequest request,
+			Model model) {
+		model.addAttribute("request", request);
+		
+		adminUserImgDeleteService.execute(model);
+		
+		
+		return "redirect:adminAccountUserModify?"
+				+ "userId=" + userId
+				+ "&page=" + page
+				+ "&searchType=" + searchType
+				+ "&searchOrderBy=" + searchOrderBy
+				+ "&sk=" + sk;
+	}
+	
+	@RequestMapping("/adminUserStatusLogListView")
+	public String adminUserStatusLogListView(
+			HttpServletRequest request,
+			AdminSearchVO searchVO,
+			Model model) {
+		
+		model.addAttribute("request", request);
+		model.addAttribute("searchVO", searchVO);
+		model.addAttribute("pname", "정지내역");
+		model.addAttribute("contentBlockJsp",
+				"../account/adminUserStatusLogListContent.jsp");
+	    model.addAttribute("contentBlockCss",
+	    		"/whale/static/css/admin/account/adminAccountUserListContent.css");
+	    accountSubBar(model);
+	    
+	    adminUserStatusLogListService.execute(model);
+	    
 		return "/admin/view/adminOutlineForm";
 	}
 	

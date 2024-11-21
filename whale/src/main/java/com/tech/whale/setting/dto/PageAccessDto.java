@@ -14,5 +14,6 @@ public class PageAccessDto {
 	private int page_access_notification;
 	private int page_access_setting;
 	private int page_access_music;
+	private int page_access_message;
 	
 }

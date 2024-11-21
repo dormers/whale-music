@@ -25,13 +25,18 @@ public class PostDto {
 	private int post_tag_id;
 	private String post_tag_text;
 	private int likeCount;
+	private int commentsCount;
 	private String post_comments_text;
 	
 	private List<CommentDto> comments;
 	
-	private String post_img_url;
-	private List<PostImgDto> images;
-	
 	private String user_nickname;
 	private String user_image_url;
+	
+    private int post_music_id;
+    private String track_id;
+    private String track_artist;
+    private String track_name;
+    private String track_album;
+    private String track_cover;
 }

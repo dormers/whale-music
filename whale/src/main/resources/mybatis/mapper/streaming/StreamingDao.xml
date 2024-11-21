@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tech.whale.streaming.models.StreamingDao">
+	
+	<select id="selectTrackId" resultType="String">
+        SELECT TRACK_ID FROM TRACK WHERE TRACK_ID = #{trackSpotifyId}
+    </select>
+    
+    <select id="selectTrackLikeId" resultType="Integer">
+        SELECT TRACK_LIKE_ID FROM TRACK_LIKE WHERE USER_ID = #{userId} AND TRACK_ID = #{trackSpotifyId}
+    </select>
+    
+    <select id="selectTrackDto" resultType="com.tech.whale.streaming.models.TrackDto">
+		SELECT
+			TRACK_ID,
+	        TRACK_ARTIST,
+	        TRACK_NAME,
+	        TRACK_ALBUM,
+	        TRACK_COVER
+	    FROM
+	        TRACK
+	    WHERE
+	        TRACK_ID = #{trackSpotifyId}
+	</select>
+	
+	<insert id="insertTrack">
+		INSERT INTO TRACK (TRACK_ID, TRACK_ARTIST, TRACK_NAME, TRACK_ALBUM, TRACK_COVER) VALUES
+						  (#{track_spotify_id},#{track_artist},#{track_name},#{track_album},#{track_cover})
+	</insert>
+	
+	<insert id="insertTrackLike">
+		INSERT INTO TRACK_LIKE (TRACK_LIKE_ID, TRACK_ID, USER_ID) VALUES
+							   (TRACK_LIKE_SEQ.NEXTVAL,
+							   #{trackSpotifyId},
+							   #{userId})
+	</insert>
+	
+	<insert id="insertTrackCnt">
+		INSERT INTO TRACK_CNT (TRACK_CNT_ID, TRACK_ID, USER_ID) VALUES
+							  (TRACK_CNT_SEQ.NEXTVAL,
+							  #{trackSpotifyId},
+							  #{userId})
+	</insert>
+	
+	<delete id="deleteTrackLike">
+		DELETE FROM TRACK_LIKE WHERE TRACK_LIKE_ID = #{trackLikeId}
+	</delete>
+
+	<!-- 좋아요 표시한 곡 목록 조회 -->
+	<select id="selectLikedTracks" parameterType="String" resultType="com.tech.whale.streaming.models.TrackDto">
+		SELECT
+			t.TRACK_ID AS track_id,
+			t.TRACK_ARTIST AS track_artist,
+			t.TRACK_NAME AS track_name,
+			t.TRACK_ALBUM AS track_album,
+			t.TRACK_COVER AS track_cover,
+			tl.TRACK_LIKE_DATE AS track_like_date
+		FROM
+			TRACK_LIKE tl
+				JOIN TRACK t ON tl.TRACK_ID = t.TRACK_ID
+		WHERE
+			tl.USER_ID = #{userId}
+	</select>
+	
+	<select id="getLikeCountInfo" resultType="Integer">
+		SELECT COUNT(*) FROM TRACK_LIKE WHERE USER_ID = #{userId}
+	</select>
+	
+	<select id="getTrackLikeCountInfo" resultType="Integer">
+		SELECT COUNT(*) FROM TRACK_LIKE WHERE USER_ID = #{userId} AND TRACK_ID = #{trackSpotifyId}
+	</select>
+	
+</mapper>

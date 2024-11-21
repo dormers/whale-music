@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tech.whale.admin.dao.AdminReportIDao">
+
+	<sql id="includeReportCnt">
+	    <choose>
+	        <when test="param2 == 1">
+	            WHERE (USER_ID LIKE '%' || #{sk} || '%')
+	        </when>
+	        <otherwise>
+	        </otherwise>
+	    </choose>
+	</sql>
+	
+	<sql id="includeReportList">
+	    <choose>
+	        <when test="param4 == 1">
+	            WHERE (USER_ID LIKE '%' || #{sk} || '%')
+	        </when>
+	        <otherwise>
+	        </otherwise>
+	    </choose>
+	</sql>
+	
+	
+	<select id="selectReportCnt" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM REPORT
+        <include refid="includeReportCnt" />
+    </select>
+    
+    <select id="adminReportList" resultType="com.tech.whale.admin.dto.AdminReportListDto">
+	    SELECT *
+	    FROM (
+	        SELECT
+	        	REPORT_USER_ID,
+	            REPORT_ID,
+	            USER_ID,
+	            FEED_ID,
+	            FEED_COMMENT_ID,
+	            POST_ID,
+	            POST_COMMENT_ID,
+	            MESSAGE_ID,
+	            REPORT_WHY,
+	            REPORT_DATE,
+	            REPORT_TAG,
+	            REPORT_TEXT,
+	            REPORT_IMG_URL,
+	            REPORT_ADMIN_CHECK,
+	            COUNT(*) OVER (
+	                PARTITION BY COALESCE(FEED_ID, FEED_COMMENT_ID, POST_ID, POST_COMMENT_ID, MESSAGE_ID)
+	            ) AS SAME_CONTENT_COUNT,
+	            ROW_NUMBER() OVER (ORDER BY REPORT_ADMIN_CHECK DESC, REPORT_ID DESC) AS RNUM
+	        FROM REPORT
+			<include refid="includeReportList" />
+	    ) 
+	    WHERE RNUM BETWEEN #{start} AND #{end}
+	    
+	</select>
+    <select id="reportContent" resultType="com.tech.whale.admin.dto.AdminReportResultDto">
+	    SELECT *
+		FROM (
+		    SELECT a.*, ROWNUM AS rn
+		    FROM (
+		        SELECT 
+		            R.REPORT_ID,
+		            R.USER_ID,
+		            R.REPORT_USER_ID,
+		            R.FEED_ID,
+		            R.FEED_COMMENT_ID,
+		            R.POST_ID,
+		            R.POST_COMMENT_ID,
+		            R.MESSAGE_ID,
+		            R.REPORT_WHY,
+		            R.REPORT_DATE,
+		            R.REPORT_TAG,
+		            R.REPORT_TEXT,
+		            R.REPORT_IMG_URL,
+		            R.REPORT_ADMIN_CHECK,
+		            RR.REPORT_LOG_ID,
+		            RR.TARGET_TYPE,
+		            RR.TARGET_ID,
+		            RR.ADMIN_ID,
+		            RR.USER_ACTION,
+		            RR.REPORT_RESULT_DATE,
+		            RR.REPORT_RESULT_ACTION,
+		            RR.REPORT_RESULT_REASON
+		        FROM 
+		            REPORT R
+		        LEFT JOIN 
+		            REPORT_RESULT RR
+		        ON 
+		            R.REPORT_ID = RR.REPORT_ID
+		        WHERE 
+		            R.REPORT_ID = #{report_id}
+		        ORDER BY 
+		            CASE WHEN RR.TARGET_TYPE != 'USER' THEN 0 ELSE 1 END
+		    ) a
+		)
+		WHERE rn = 1
+	</select>
+    
+    <sql id="includeSelectUser">
+	    <choose>
+	        <when test="param2 == 1">
+	            SELECT USER_ID FROM FEED WHERE FEED_ID = #{writingId}
+	        </when>
+	        <when test="param2 == 2">
+	            SELECT USER_ID FROM FEED_COMMENTS WHERE FEED_COMMENTS_ID = #{writingId}
+	        </when>
+	        <when test="param2 == 3">
+	            SELECT USER_ID FROM POST WHERE POST_ID = #{writingId}
+	        </when>
+	        <when test="param2 == 4">
+	            SELECT USER_ID FROM POST_COMMENTS WHERE POST_COMMENTS_ID = #{writingId}
+	        </when>
+	        <when test="param2 == 5">
+	            SELECT USER_ID FROM MESSAGE_NOTI WHERE MESSAGE_NOTI_ID = #{writingId}
+	        </when>
+	        
+	        <otherwise>
+	        </otherwise>
+	    </choose>
+	</sql>
+    
+    <select id="selectUserId" resultType="String">
+    	<include refid="includeSelectUser" />
+    </select>
+    
+    <sql id="includeEndDate">
+    	<choose>
+	        <when test="endDate == 0">
+	        	null
+	        </when>
+	        <when test="endDate == 1">
+	        	sysdate+1
+	        </when>
+	        <when test="endDate == 2">
+	        	sysdate+9999
+	        </when>
+	        <otherwise>
+	        </otherwise>
+	    </choose>
+    </sql>
+    
+	<insert id="reportResult">
+		INSERT INTO REPORT_RESULT VALUES(
+			REPORT_RESULT_SEQ.NEXTVAL,
+			#{report_id},
+			#{target_type},
+			#{target_id},
+			#{myId},
+			SYSDATE,
+			#{action},
+			#{actionReason},
+			#{userId},
+			#{userStatus},
+			<include refid="includeEndDate" />
+			)
+	</insert>
+	
+	<update id="reportAdminCh">
+		UPDATE REPORT SET REPORT_ADMIN_CHECK = 1 WHERE REPORT_ID = #{report_id}
+	</update>
+    
+    <sql id="includeTotalReport">
+    	<choose>
+    		<when test="writingType == 'feed_comments'">
+    			FEED_COMMENT_ID
+    		</when>
+    		<when test="writingType == 'post_comments'">
+    			POST_COMMENT_ID
+    		</when>
+    		<when test="writingType == 'feed'">
+    			FEED_ID
+    		</when>
+    		<when test="writingType == 'post'">
+    			POST_ID
+    		</when>
+    		<when test="writingType == 'message'">
+    			MESSAGE_ID
+    		</when>
+    	</choose>
+    </sql>
+    
+	<select id="totalReport" resultType="com.tech.whale.admin.dto.AdminReportOverlapDto">
+		SELECT REPORT_ID, USER_ID FROM REPORT
+		WHERE <include refid="includeTotalReport" /> = 
+			(SELECT <include refid="includeTotalReport" /> FROM REPORT WHERE REPORT_ID = #{report_id})
+			AND REPORT_ADMIN_CHECK IS NULL
+	</select>
+	
+	
+</mapper>

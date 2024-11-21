@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "spring.websocket.buffer-size-limit",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.websocket.buffer-size-limit'"
+  },
+  {
+    "name": "spring.websocket.message-size-limit",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.websocket.message-size-limit'"
+  }
+]}

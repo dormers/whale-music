@@ -1,28 +1,35 @@
 .adminSubBar {
 	display: flex;
     width: 200px;
-    margin-top: 5px;
-    margin-left:0;
-    background-color: white;
-    font-size: 22px;
-    border-right: 1px solid #ccc;
+    font-size: 20px;
     height:auto;
     min-width: 200px;
+    /* border-right: 1px solid #ccc; */
 }
 
 .adminSubBar ul {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
     list-style: none;
-    padding-left:10px;
+    margin: 0;
+    padding: 40px 15px 0 15px;
+    width: 200px;
 }
 
 .adminSubBar ul li {
-    padding: 0 0 0 10px;
-    margin: 10px 0px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+    margin: 0;
+    padding: 20px 0;
+    border-top: 1px solid rgb(208, 208, 208);
+    border-bottom: 1px solid rgb(208, 208, 208);
 }
 
 .adminSubBar a {
     text-decoration: none;
-    color: #aaa;
+    color: gray;
 }
 
 .adminSubBar a:hover {
